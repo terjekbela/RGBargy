@@ -1,0 +1,37 @@
+.program vgahsync
+
+
+
+pull block              ; Pull from FIFO to OSR (only happens once)
+.wrap_target            ; Program wraps to here
+
+; ACTIVE + FRONTPORCH
+mov x, osr              ; Copy value from OSR to x scratch register
+activeporch:
+   jmp x-- activeporch  ; Remain high in active mode and front porch
+
+; SYNC PULSE
+pulse:
+    set pins, 0 [31]    ; Low for hsync pulse (32 cycles)
+    set pins, 0 [31]    ; Low for hsync pulse (64 cycles)
+    set pins, 0 [31]    ; Low for hsync pulse (96 cycles)
+
+; BACKPORCH
+backporch:
+    set pins, 1 [31]    ; High for back porch (32 cycles)
+    set pins, 1 [12]    ; High for back porch (45 cycles)
+    irq 0       [1]     ; Set IRQ to signal end of line (47 cycles)
+.wrap
+
+
+
+% c-sdk {
+static inline void vgahsync_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = vgahsync_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_clkdiv(&c, 5) ;
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
