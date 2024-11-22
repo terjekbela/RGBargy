@@ -22,7 +22,9 @@ unsigned char * address_pointer = &vga_data_array[0] ;
 #define GREEN_PIN 7
 #define BLUE_PIN  8
 
-#define swap(a, b) { short t = a; a = b; b = t; }
+#define SWAP(a, b) { short t = a; a = b; b = t; }
+#define TOPMASK 0b00001111
+#define BOTTOMMASK 0b11110000
 
 RGBargy::RGBargy() {
 
@@ -75,9 +77,9 @@ void RGBargy::pixel(short x, short y, byte color) {
     if (y > 479) y = 479;
     int pixel = ((640 * y) + x);
     if (pixel & 1) {
-        vga_data_array[pixel>>1] |= (color << 3);
-    } else {
-        vga_data_array[pixel>>1] |= (color);
+        vga_data_array[pixel>>1] = (vga_data_array[pixel>>1] & TOPMASK) | (color << 4) ;
+    }
+    else {
+        vga_data_array[pixel>>1] = (vga_data_array[pixel>>1] & BOTTOMMASK) | (color) ;
     }
 }
-
