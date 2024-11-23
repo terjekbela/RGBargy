@@ -1,4 +1,4 @@
-.program vgargb
+.program vgacolor
 
 pull block 					; Pull from FIFO to OSR (only once)
 mov y, osr 					; Copy value from OSR to y scratch register
@@ -20,8 +20,8 @@ colorout:
 
 
 % c-sdk {
-static inline void vgargb_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = vgargb_program_get_default_config(offset);
+static inline void vgacolor_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = vgacolor_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 4);
     sm_config_set_out_pins(&c, pin, 4);
     pio_gpio_init(pio, pin);
