@@ -9,6 +9,7 @@ class RGBargy {
   public:
     RGBargy(byte mode);
     void pixel(short x, short y, byte color);
+    void line(short x0, short y0, short x1, short y1, byte color);
   private:
     int _pin;
 };

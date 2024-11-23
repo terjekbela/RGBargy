@@ -74,3 +74,36 @@ void RGBargy::pixel(short x, short y, byte color) {
         vga_framebuffer[pixel>>1] = (vga_framebuffer[pixel>>1] & BOTTOMMASK) | (color) ;
     }
 }
+
+void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
+    short dx, dy, ystep, err;
+    short steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep) {
+        SWAP(x0, y0);
+        SWAP(x1, y1);
+    }
+    if (x0 > x1) {
+        SWAP(x0, x1);
+        SWAP(y0, y1);
+    }
+    dx = x1 - x0;
+    dy = abs(y1 - y0);
+    err = dx / 2;
+    if (y0 < y1) {
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+    for (; x0<=x1; x0++) {
+        if (steep) {
+            pixel(y0, x0, color);
+        } else {
+            pixel(x0, y0, color);
+        }
+        err -= dy;
+        if (err < 0) {
+            y0 += ystep;
+            err += dx;
+        }
+    }
+}
