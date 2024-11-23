@@ -13,8 +13,8 @@
 #define RGB_ACTIVE 319
 #define TXCOUNT 153600
 
-unsigned char vga_data_array[TXCOUNT];
-unsigned char * address_pointer = &vga_data_array[0] ;
+unsigned char vga_framebuffer[TXCOUNT];
+unsigned char * fb_pointer = &vga_framebuffer[0] ;
 
 #define HSYNC_PIN 4
 #define VSYNC_PIN 5
@@ -26,11 +26,7 @@ unsigned char * address_pointer = &vga_data_array[0] ;
 #define TOPMASK 0b00001111
 #define BOTTOMMASK 0b11110000
 
-RGBargy::RGBargy() {
-
-}
-
-void RGBargy::init() {
+RGBargy::RGBargy(byte mode) {
     PIO pio = pio0;
     uint hsync_offset = pio_add_program(pio, &vgahsync_program);
     uint vsync_offset = pio_add_program(pio, &vgavsync_program);
@@ -53,14 +49,14 @@ void RGBargy::init() {
     channel_config_set_write_increment(&c0, false);
     channel_config_set_dreq(&c0, DREQ_PIO0_TX2) ; 
     channel_config_set_chain_to(&c0, rgb_chan_1);
-    dma_channel_configure(rgb_chan_0, &c0, &pio->txf[rgb_sm], &vga_data_array, TXCOUNT, false);
+    dma_channel_configure(rgb_chan_0, &c0, &pio->txf[rgb_sm], &vga_framebuffer, TXCOUNT, false);
 
     dma_channel_config c1 = dma_channel_get_default_config(rgb_chan_1);
     channel_config_set_transfer_data_size(&c1, DMA_SIZE_32);
     channel_config_set_read_increment(&c1, false);
     channel_config_set_write_increment(&c1, false);
     channel_config_set_chain_to(&c1, rgb_chan_0);
-    dma_channel_configure(rgb_chan_1, &c1, &dma_hw->ch[rgb_chan_0].read_addr, &address_pointer, 1, false);
+    dma_channel_configure(rgb_chan_1, &c1, &dma_hw->ch[rgb_chan_0].read_addr, &fb_pointer, 1, false);
 
     pio_sm_put_blocking(pio, hsync_sm, H_ACTIVE);
     pio_sm_put_blocking(pio, vsync_sm, V_ACTIVE);
@@ -71,15 +67,10 @@ void RGBargy::init() {
 }
 
 void RGBargy::pixel(short x, short y, byte color) {
-    if (x > 639) x = 639;
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (y > 479) y = 479;
     int pixel = ((640 * y) + x);
     if (pixel & 1) {
-        vga_data_array[pixel>>1] = (vga_data_array[pixel>>1] & TOPMASK) | (color << 4) ;
-    }
-    else {
-        vga_data_array[pixel>>1] = (vga_data_array[pixel>>1] & BOTTOMMASK) | (color) ;
+        vga_framebuffer[pixel>>1] = (vga_framebuffer[pixel>>1] & TOPMASK) | (color << 4) ;
+    } else {
+        vga_framebuffer[pixel>>1] = (vga_framebuffer[pixel>>1] & BOTTOMMASK) | (color) ;
     }
 }
