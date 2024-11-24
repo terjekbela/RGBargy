@@ -9,9 +9,9 @@ This is an arduino library providing a display-driver using the VGA protocol for
 |-----------------|-------------------|
 | GPIO 4          | Horizontal sync   |
 | GPIO 5          | Vertical sync     |
-| GPIO 6          | Red (w/330R)      |
+| GPIO 6          | Red   (w/330R)    |
 | GPIO 7          | Green (w/330R)    |
-| GPIO 8          | Blue (w/330R)     |
+| GPIO 8          | Blue  (w/330R)    |
 | GND             | GND               |
 
 
@@ -20,11 +20,10 @@ This is an arduino library providing a display-driver using the VGA protocol for
 | Resolution | Refresh rate | Pixel freq |  Horizontal     |                |                | Vertical |      |      |
 |------------|--------------|-----------:|----------------:|---------------:|---------------:|---------:|-----:|-----:|
 |            |              |            | front<br/>porch | sync<br/>pulse | back<br/>porch | front    | sync | back |
-|            |              |            | front<br/>porch | sync<br/>pulse | back<br/>porch | front    | sync | back |
 |   640x480  |        60 Hz | 25.175 MHz |              16 |             96 |             48 |       11 |    2 |   31 |
 |   640x480  |        72 Hz | 31.500 MHz |              24 |             40 |            128 |        9 |    3 |   28 |
-|   640x480  |        75 Hz | 31.050 MHz |              16 |             96 |             48 |       11 |    2 |   32 |
-|   640x480  |        75 Hz | 31.050 MHz |              32 |             48 |            112 |        1 |    3 |   25 |
+|   640x480  |        75 Hz | 31.500 MHz |              16 |             96 |             48 |       11 |    2 |   32 |
+|   640x480  |        85 Hz | 36.000 MHz |              32 |             48 |            112 |        1 |    3 |   25 |
 |   800x600  |        56 Hz | 38.810 MHz |              32 |            128 |            128 |        1 |    4 |   14 |
 |   800x600  |        60 Hz | 40.000 MHz |              40 |            128 |             88 |        1 |    4 |   23 |
 |   800x600  |        72 Hz | 50.000 MHz |              56 |            120 |             64 |       37 |    6 |   23 |
