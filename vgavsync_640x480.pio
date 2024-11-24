@@ -1,45 +1,45 @@
-.program vsync
+.program vgavsync_640x480
 .side_set 1 opt
 
 
 
-pull block                        ; Pull from FIFO to OSR (only once)
-.wrap_target                      ; Program wraps to here
+pull block                        ; get active + vfront length (once)
+.wrap_target
 
-; ACTIVE
-mov x, osr                        ; Copy value from OSR to x scratch register
-activefront:
-    wait 1 irq 0                  ; Wait for hsync to go high
-    irq 1                         ; Signal that we're in active mode
-    jmp x-- activefront           ; Remain in active mode, decrementing counter
+mov x, osr
+activefront:                      ; active area + vfront porch loop
+    wait 1 irq 0
+    irq 1
+    jmp x-- activefront
 
-; FRONTPORCH
-set y, 9                          ;
+set y, 9
 frontporch:
-    wait 1 irq 0                  ;
-    jmp y-- frontporch            ;
+    wait 1 irq 0
+    jmp y-- frontporch
 
-; SYNC PULSE
-set pins, 0                       ; Set pin low
-wait 1 irq 0                      ; Wait for one line
-wait 1 irq 0                      ; Wait for a second line
 
-; BACKPORCH
-set y, 31                         ; First part of back porch into y scratch register (and delays a cycle)
-;set pins, 1                      ; Raise high for back porch (delaying a set cycle) - REPLACED WITH SIDESET
+
+set pins, 0                       ; vsync pulse for 2 cycles
+vsync:
+    wait 1 irq 0
+    wait 1 irq 0
+
+
+
+
+
+set y, 31
 backporch:
-    wait 1 irq 0   side 1         ; Wait for hsync to go high - SIDESET REPLACEMENT HERE
-    jmp y-- backporch             ; Remain in backporch, decrementing counter
+    wait 1 irq 0   side 1         ; back porch for 31+2 = 33 cycles
+    jmp y-- backporch
 
-;wait 1 irq 0                      ; Wait for final (33rd) backporch line (eliminated)
-
-.wrap                             ; Program wraps from here
+.wrap
 
 
 
 % c-sdk {
-static inline void vsync_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = vsync_program_get_default_config(offset);
+static inline void vgavsync_640x480_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = vgavsync_640x480_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_sideset_pins(&c, pin);
     sm_config_set_clkdiv(&c, 5) ;
