@@ -1,0 +1,34 @@
+.program vgahsync_800x600
+
+
+
+pull block                        ; get active + hfront length (once)
+.wrap_target
+
+mov x, osr
+activehporch:                     ; active area + hfront porch loop
+    jmp x-- activehporch 
+
+hsync:                            ; hsync pulse for 32+32 = 64 cycles
+    set pins, 1 [31]              ; hsync signal is POSITIVE
+    set pins, 1 [31]
+
+set x, 4
+backporch:                        ; back porch for 5*30+2 = 152 cycles
+    set pins, 0 [29]
+    jmp x-- backporch 
+    irq 0       [1]
+.wrap
+
+
+
+% c-sdk {
+static inline void vgahsync_800x600_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = vgahsync_800x600_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_clkdiv(&c, 4) ;
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
