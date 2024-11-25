@@ -17,16 +17,10 @@ frontporch:
     wait 1 irq 0
     jmp y-- frontporch
 
-
-
 set pins, 0                       ; vsync pulse for 2 cycles
 vsync:
     wait 1 irq 0
     wait 1 irq 0
-
-
-
-
 
 set y, 31
 backporch:

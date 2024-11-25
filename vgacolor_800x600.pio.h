@@ -13,10 +13,10 @@ static const uint16_t vgacolor_800x600_program_instructions[] = {
             //     .wrap_target
     0xe000, //  2: set    pins, 0                    
     0xa022, //  3: mov    x, y                       
-    0x22c1, //  4: wait   1 irq, 1               [2] 
+    0x21c1, //  4: wait   1 irq, 1               [1] 
     0x80a0, //  5: pull   block                      
-    0x6304, //  6: out    pins, 4                [3] 
-    0x6104, //  7: out    pins, 4                [1] 
+    0x6204, //  6: out    pins, 4                [2] 
+    0x6004, //  7: out    pins, 4                    
     0x0045, //  8: jmp    x--, 5                     
             //     .wrap
 };

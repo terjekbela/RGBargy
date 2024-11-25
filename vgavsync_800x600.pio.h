@@ -16,12 +16,12 @@ static const uint16_t vgavsync_800x600_program_instructions[] = {
     0x0042, //  4: jmp    x--, 2                     
     0x20c0, //  5: wait   1 irq, 0                   
     0xe001, //  6: set    pins, 1                    
-    0x20c0, //  7: wait   1 irq, 0                   
+    0xe023, //  7: set    x, 3                       
     0x20c0, //  8: wait   1 irq, 0                   
-    0x20c0, //  9: wait   1 irq, 0                   
-    0xe059, // 10: set    y, 25                      
+    0x0048, //  9: jmp    x--, 8                     
+    0xe034, // 10: set    x, 20                      
     0x30c0, // 11: wait   1 irq, 0        side 0     
-    0x008b, // 12: jmp    y--, 11                    
+    0x004b, // 12: jmp    x--, 11                    
             //     .wrap
 };
 
@@ -43,7 +43,7 @@ static inline void vgavsync_800x600_program_init(PIO pio, uint sm, uint offset, 
     pio_sm_config c = vgavsync_800x600_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_sideset_pins(&c, pin);
-    sm_config_set_clkdiv(&c, 4);
+    sm_config_set_clkdiv(&c, 3);
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     pio_sm_init(pio, sm, offset, &c);

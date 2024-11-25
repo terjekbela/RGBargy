@@ -12,26 +12,19 @@ activefront:                      ; active area + vfront porch loop
     irq 1
     jmp x-- activefront
 
-
 frontporch:
     wait 1 irq 0
 
-
-
-
-set pins, 1                       ; vsync pulse for 3 cycles
+set pins, 1                       ; vsync pulse for 4 cycles
+set x, 3
 vsync:
     wait 1 irq 0
-    wait 1 irq 0
-    wait 1 irq 0
+    jmp x-- vsync
 
-
-
-
-set y, 25
+set x, 20
 backporch:
-    wait 1 irq 0   side 0         ; back porch for 25+2 = 27 cycles
-    jmp y-- backporch
+    wait 1 irq 0   side 0         ; back porch for 21+2 = 23 cycles
+    jmp x-- backporch
 
 .wrap
 
@@ -42,7 +35,7 @@ static inline void vgavsync_800x600_program_init(PIO pio, uint sm, uint offset, 
     pio_sm_config c = vgavsync_800x600_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_sideset_pins(&c, pin);
-    sm_config_set_clkdiv(&c, 4);
+    sm_config_set_clkdiv(&c, 3);
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     pio_sm_init(pio, sm, offset, &c);
