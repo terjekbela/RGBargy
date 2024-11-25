@@ -1,7 +1,25 @@
-# RGBargy - a VGA display library for Arduino and RP2* microcontrollers
+# RGBargy
 
-This is an arduino library providing a display-driver using the VGA protocol for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen from directly the arduino framework, and not having to install the pico development environment.
+__VGA display library for Arduino and RP2* microcontrollers__
 
+This is an Arduino library providing a VGA display-driver for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen directly from the Arduino framework, and not having to install compilers or the pico development environment.
+
+```
+#include <RGBargy.h>
+
+RGBargy rgbg(RGBG_MODE_640x480);
+
+void setup() {
+  randomSeed(analogRead(0));
+}
+
+void loop() {
+    rgbg.line(
+        random(640), random(480), random(640), random(480), random(7)+1
+    );
+    delay(1);
+}
+```
 
 ## Hardware connections / pinout
 
@@ -15,21 +33,39 @@ This is an arduino library providing a display-driver using the VGA protocol for
 | GND             | GND               |
 
 
-## VGA timings for popular resolutions and refresh rates
+## VGA timings for supported resolutions
 
-| Resolution | Refresh rate | Pixel freq |  Horizontal     |                |                | Vertical |      |      |
-|------------|--------------|-----------:|----------------:|---------------:|---------------:|---------:|-----:|-----:|
-|            |              |            | front<br/>porch | sync<br/>pulse | back<br/>porch | front    | sync | back |
-|   640x480  |        60 Hz | 25.175 MHz |              16 |             96 |             48 |       11 |    2 |   31 |
-|   640x480  |        72 Hz | 31.500 MHz |              24 |             40 |            128 |        9 |    3 |   28 |
-|   640x480  |        75 Hz | 31.500 MHz |              16 |             96 |             48 |       11 |    2 |   32 |
-|   640x480  |        85 Hz | 36.000 MHz |              32 |             48 |            112 |        1 |    3 |   25 |
-|   800x600  |        56 Hz | 38.810 MHz |              32 |            128 |            128 |        1 |    4 |   14 |
-|   800x600  |        60 Hz | 40.000 MHz |              40 |            128 |             88 |        1 |    4 |   23 |
-|   800x600  |        72 Hz | 50.000 MHz |              56 |            120 |             64 |       37 |    6 |   23 |
-|   800x600  |        75 Hz | 49.500 MHz |              16 |             80 |            160 |        1 |    2 |   21 |
-|   800x600  |        85 Hz | 56.250 MHz |              32 |             64 |            152 |        1 |    3 |   27 |
-|  1024x768  |        60 Hz | 65.000 MHz |              24 |            136 |            160 |        3 |    6 |   29 |
-|  1024x768  |        70 Hz | 75.000 MHz |              24 |            136 |            144 |        3 |    6 |   29 |
-|  1024x768  |        75 Hz | 78.750 MHz |              16 |             96 |            176 |        1 |    3 |   28 |
-|  1024x768  |        85 Hz | 94.500 MHz |              48 |             96 |            208 |        1 |    3 |   36 |
+For this library to work, the CPU frequency has to be selected manually in the Arduino IDE to match the resolution used in the code. The CPU frequency must be an integer multiple of the pixel frequencies below. See "CPU freq" column.
+
+| Resolution  | Refresh rate | Pixel freq | CPU frequency | Clock divider | Status       |
+|-------------|-------------:|-----------:|--------------:|--------------:|--------------|
+| __640x480__ |         60Hz | 25.175 MHz |  125 MHz      |            5x | working      |
+|   800x600   |         72Hz | 50.000 MHz |  150 MHz      |            3x | in the works |
+|   800x600   |         85Hz | 56.250 MHz |  225 MHz      |            4x | easier?!?    |
+|  1024x768   |         70Hz | 75.000 MHz |  225 MHz      |            3x | in the works |
+
+The table below shows front porch, sync pulse and back porch lengths for both horizontal and vertical sync lines. For the 640x480 resolution we're actually using a round 25MHz as the pixel clock, instead of 25.175MHz specified in the standard. All monitors we tested seem to tolarate this so far.
+
+| Resolution | Horizontal sync |       |       |      | Vertical sync |       |      |      |
+|------------|-----------------|------:|------:|-----:|---------------|------:|-----:|-----:|
+|            | sync polarity   | front | sync  | back | sync polarity | front | sync | back |
+|   640x480  | NEGATIVE ---    |    16 |    96 |   48 | NEGATIVE ---  |    10 |    2 |   33 |
+|   800x600  | POSITIVE +++    |    56 |   120 |   64 | POSITIVE +++  |    36 |    6 |   23 |
+|   800x600  | POSITIVE +++    |    56 |   120 |   64 | POSITIVE +++  |     1 |    3 |   27 |
+|  1024x768  | NEGATIVE ---    |    24 |   136 |  144 | NEGATIVE ---  |     3 |    6 |   29 |
+
+
+## References
+
+### Algos
+- [Midpoint circle algorithm](https://en.wikipedia.org/wiki/Midpoint_circle_algorithm)
+- [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
+
+### Tools / libraries used
+- [Arduino Pico Core ](https://github.com/earlephilhower/arduino-pico)
+- [Online PIO Assembler](https://wokwi.com/tools/pioasm)
+
+### Docs
+
+## License
+- MIT license
