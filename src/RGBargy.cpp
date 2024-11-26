@@ -4,9 +4,12 @@
 #include "hardware/dma.h"
 
 #include "RGBargy.h"
-#include "vgahsync_640x480.pio.h"
-#include "vgavsync_640x480.pio.h"
-#include "vgacolor_640x480.pio.h"
+#include "pio-sdk/vgahsync_640x480.pio.h"
+#include "pio-sdk/vgavsync_640x480.pio.h"
+#include "pio-sdk/vgacolor_640x480.pio.h"
+#include "pio-sdk/vgahsync_800x600.pio.h"
+#include "pio-sdk/vgavsync_800x600.pio.h"
+#include "pio-sdk/vgacolor_800x600.pio.h"
 
 #define HSYNC_PIN  4
 #define VSYNC_PIN  5
@@ -16,13 +19,14 @@
 #define TOPMASK    0b00001111
 #define BOTTOMMASK 0b11110000
 
-#define TXCOUNT 153600
-unsigned char vga_framebuffer[TXCOUNT];
-unsigned char * fb_pointer = &vga_framebuffer[0];
+//#define TXCOUNT 153600    // 640x480 4 bit per pixel
+#define TXCOUNT 240000  // 800x600 4 bit per pixel
+
+unsigned char fb_array0[TXCOUNT];
+unsigned char *fb_pointer = &fb_array0[0];
 
 short mode_width, mode_height;
 short mode_hfrontporch, mode_hsync, mode_hbackporch;
-short mode_vfrontporch, mode_vsync, mode_vbackporch;
 
 RGBargy::RGBargy(byte mode) {
     // handling resolution-dependent parameters
@@ -32,21 +36,12 @@ RGBargy::RGBargy(byte mode) {
             mode_width       = 640;
             mode_height      = 480;
             mode_hfrontporch = 16;
-            mode_hsync       = 96;
-            mode_hbackporch  = 48;
-            mode_vfrontporch = 11;
-            mode_vsync       = 2;
-            mode_vbackporch  = 31;
             break;
         case RGBG_MODE_800x600:
             mode_width       = 800;
             mode_height      = 600;
-            mode_hfrontporch = 56;
-            mode_hsync       = 120;
-            mode_hbackporch  = 64;
-            mode_vfrontporch = 37;
-            mode_vsync       = 6;
-            mode_vbackporch  = 23;
+            mode_hfrontporch = 40;    // @60hz
+            // mode_hfrontporch = 32; // @85hz
             break;
         case RGBG_MODE_1024x768:
             break;
@@ -60,12 +55,25 @@ RGBargy::RGBargy(byte mode) {
     uint hsync_sm = 0;
     uint vsync_sm = 1;
     uint color_sm = 2;
-    uint hsync_offset = pio_add_program(pio, &vgahsync_program);
-    uint vsync_offset = pio_add_program(pio, &vgavsync_program);
-    uint color_offset = pio_add_program(pio, &vgacolor_program);
-    vgahsync_program_init(pio, hsync_sm, hsync_offset, HSYNC_PIN);
-    vgavsync_program_init(pio, vsync_sm, vsync_offset, VSYNC_PIN);
-    vgacolor_program_init(pio, color_sm, color_offset, COLOR_PINS);
+    uint hsync_offset, vsync_offset, color_offset;
+    switch(mode) {
+        case RGBG_MODE_640x480:
+            //hsync_offset = pio_add_program(pio, &vgahsync_640x480_program);
+            //vsync_offset = pio_add_program(pio, &vgavsync_640x480_program);
+            //color_offset = pio_add_program(pio, &vgacolor_640x480_program);
+            //vgahsync_640x480_program_init(pio, hsync_sm, hsync_offset, HSYNC_PIN);
+            //vgavsync_640x480_program_init(pio, vsync_sm, vsync_offset, VSYNC_PIN);
+            //vgacolor_640x480_program_init(pio, color_sm, color_offset, COLOR_PINS);
+            break;
+        case RGBG_MODE_800x600:
+            hsync_offset = pio_add_program(pio, &vgahsync_800x600_program);
+            vsync_offset = pio_add_program(pio, &vgavsync_800x600_program);
+            color_offset = pio_add_program(pio, &vgacolor_800x600_program);
+            vgahsync_800x600_program_init(pio, hsync_sm, hsync_offset, HSYNC_PIN);
+            vgavsync_800x600_program_init(pio, vsync_sm, vsync_offset, VSYNC_PIN);
+            vgacolor_800x600_program_init(pio, color_sm, color_offset, COLOR_PINS);
+            break;
+    }
     pio_sm_put_blocking(pio, hsync_sm, hsync_active);
     pio_sm_put_blocking(pio, vsync_sm, vsync_active);
     pio_sm_put_blocking(pio, color_sm, color_active);
@@ -79,7 +87,7 @@ RGBargy::RGBargy(byte mode) {
     channel_config_set_write_increment(&c0, false);
     channel_config_set_dreq(&c0, DREQ_PIO0_TX2) ; 
     channel_config_set_chain_to(&c0, rgb_chan_1);
-    dma_channel_configure(rgb_chan_0, &c0, &pio->txf[color_sm], &vga_framebuffer, TXCOUNT, false);
+    dma_channel_configure(rgb_chan_0, &c0, &pio->txf[color_sm], &fb_array0, TXCOUNT, false);
     dma_channel_config c1 = dma_channel_get_default_config(rgb_chan_1);
     channel_config_set_transfer_data_size(&c1, DMA_SIZE_32);
     channel_config_set_read_increment(&c1, false);
@@ -93,19 +101,19 @@ RGBargy::RGBargy(byte mode) {
 }
 
 void RGBargy::pixel(short x, short y, byte color) {
-    int pixel = ((640 * y) + x);
+    int pixel = ((mode_width * y) + x);
     if (pixel & 1) {
-        vga_framebuffer[pixel>>1] = (vga_framebuffer[pixel>>1] & TOPMASK) | (color << 4) ;
+        fb_array0[pixel>>1] = (fb_array0[pixel>>1] & TOPMASK)    | (color << 4) ;
     } else {
-        vga_framebuffer[pixel>>1] = (vga_framebuffer[pixel>>1] & BOTTOMMASK) | (color) ;
+        fb_array0[pixel>>1] = (fb_array0[pixel>>1] & BOTTOMMASK) | (color) ;
     }
 }
 
 int RGBargy::get_mode_width() {
-    return 640;
+    return mode_width;
 };
 int RGBargy::get_mode_height() {
-    return 480;
+    return mode_height;
 };
 byte RGBargy::get_mode_bitdepth() {
     return 3;
