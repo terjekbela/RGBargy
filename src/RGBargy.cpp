@@ -16,7 +16,7 @@ short mode_hfrontporch, mode_hsync, mode_hbackporch;
 
 RGBargy::RGBargy(byte mode) {
     // handling resolution-dependent parameters
-    int fb_size, hsync_active, vsync_active, color_active;
+    int hsync_active, vsync_active, color_active;
     switch(mode) {
         case RGBG_MODE_640x480:
             mode_width       = 640;
@@ -35,7 +35,7 @@ RGBargy::RGBargy(byte mode) {
     vsync_active = mode_height - 1;
     color_active = mode_width / 2 - 1;
 
-    // allocating framebuffer
+    // allocating framebuffer based on resolution
     fb_size     = mode_width * mode_height / 2;
     fb_pointer0 = (unsigned char *)malloc(fb_size);
     memset(fb_pointer0, 0, fb_size);
@@ -77,7 +77,6 @@ RGBargy::RGBargy(byte mode) {
     channel_config_set_write_increment(&c0, false);
     channel_config_set_dreq(&c0, DREQ_PIO0_TX2) ; 
     channel_config_set_chain_to(&c0, rgb_chan_1);
-    //dma_channel_configure(rgb_chan_0, &c0, &pio->txf[color_sm], &fb_array0, TXCOUNT, false);
     dma_channel_configure(rgb_chan_0, &c0, &pio->txf[color_sm], &*fb_pointer0, fb_size, false);
     dma_channel_config c1 = dma_channel_get_default_config(rgb_chan_1);
     channel_config_set_transfer_data_size(&c1, DMA_SIZE_32);
@@ -91,6 +90,10 @@ RGBargy::RGBargy(byte mode) {
     dma_start_channel_mask((1u << rgb_chan_0)) ;
 }
 
+void RGBargy::clear() {
+    memset(fb_pointer0, 0, fb_size);
+}
+
 void RGBargy::pixel(short x, short y, byte color) {
     int pixel = ((mode_width * y) + x);
     if (pixel & 1) {
@@ -99,16 +102,6 @@ void RGBargy::pixel(short x, short y, byte color) {
         fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & BOTTOMMASK) | (color) ;
     }
 }
-
-int RGBargy::get_mode_width() {
-    return mode_width;
-};
-int RGBargy::get_mode_height() {
-    return mode_height;
-};
-byte RGBargy::get_mode_bitdepth() {
-    return 3;
-};
 
 void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
     short dx, dy, ystep, err;
@@ -141,4 +134,14 @@ void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
             err += dx;
         }
     }
-}
+};
+
+int RGBargy::get_mode_width() {
+    return mode_width;
+};
+int RGBargy::get_mode_height() {
+    return mode_height;
+};
+int RGBargy::get_mode_bitdepth() {
+    return 3;
+};
