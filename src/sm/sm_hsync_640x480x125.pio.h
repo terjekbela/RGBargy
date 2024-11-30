@@ -4,10 +4,10 @@
 #include "hardware/pio.h"
 #endif
 
-#define vgahsync_640x480_wrap_target 1
-#define vgahsync_640x480_wrap 8
+#define sm_hsync_640x480x125_wrap_target 1
+#define sm_hsync_640x480x125_wrap 8
 
-static const uint16_t vgahsync_640x480_program_instructions[] = {
+static const uint16_t sm_hsync_640x480x125_program_instructions[] = {
     0x80a0, //  0: pull   block                      
             //     .wrap_target
     0xa027, //  1: mov    x, osr                     
@@ -22,20 +22,20 @@ static const uint16_t vgahsync_640x480_program_instructions[] = {
 };
 
 #if !PICO_NO_HARDWARE
-static const struct pio_program vgahsync_640x480_program = {
-    .instructions = vgahsync_640x480_program_instructions,
+static const struct pio_program sm_hsync_640x480x125_program = {
+    .instructions = sm_hsync_640x480x125_program_instructions,
     .length = 9,
     .origin = -1,
 };
 
-static inline pio_sm_config vgahsync_640x480_program_get_default_config(uint offset) {
+static inline pio_sm_config sm_hsync_640x480x125_program_get_default_config(uint offset) {
     pio_sm_config c = pio_get_default_sm_config();
-    sm_config_set_wrap(&c, offset + vgahsync_640x480_wrap_target, offset + vgahsync_640x480_wrap);
+    sm_config_set_wrap(&c, offset + sm_hsync_640x480x125_wrap_target, offset + sm_hsync_640x480x125_wrap);
     return c;
 }
 
-static inline void vgahsync_640x480_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = vgahsync_640x480_program_get_default_config(offset);
+static inline void sm_hsync_640x480x125_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = sm_hsync_640x480x125_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_clkdiv(&c, 5) ;
     pio_gpio_init(pio, pin);
