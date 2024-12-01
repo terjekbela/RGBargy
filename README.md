@@ -7,18 +7,17 @@ This is an Arduino library providing a VGA display-driver for the RP2* family of
 ```
 #include <RGBargy.h>
 
-RGBargy rgbg(RGBG_MODE_640x480);
+RGBargy rgbg(RGBG_MODE_640x480, 125);
 
 void setup() {
   randomSeed(analogRead(0));
 }
 
 void loop() {
-    rgbg.line(
-        random(640), random(480), random(640), random(480), random(7)+1
-    );
+    rgbg.line(r(640), r(480), r(640), r(480), r(8));
     delay(1);
 }
+int r(int r) {return random(r);}
 ```
 
 ## Hardware connections / pinout
@@ -37,13 +36,18 @@ void loop() {
 
 For this library to work, the CPU frequency has to be selected manually in the Arduino IDE to match the resolution used in the code. The CPU frequency must be an integer multiple of the pixel frequencies below. See "CPU freq" column.
 
-| Resolution  | Refresh rate | Pixel freq | CPU frequency | Clock divider | Status       |
-|-------------|-------------:|-----------:|--------------:|--------------:|--------------|
-| __640x480__ |         60Hz | 25.175 MHz |  125 MHz      |            5x | __working__  |
-| __800x600__ |         60Hz | 40.000 MHz |  120 MHz      |            3x | __working__  |
-|   800x600   |         60Hz | 40.000 MHz |  200 MHz      |            5x | maybe?!      |
-|   800x600   |         85Hz | 56.250 MHz |  225 MHz      |            4x | __testing__  |
-|  1024x768   |         70Hz | 75.000 MHz |  225 MHz      |            3x | in the works |
+Please note that in the current version you actually need to pass the selected cpu freq in the constructor, because it's tricky to get an correct result from the pico api right now.
+
+| Resolution  | Refresh rate | Pixel freq | set CPU freq | Clock divider | Dev status   |
+|-------------|-------------:|-----------:|-------------:|--------------:|--------------|
+| __640x480__ |         60Hz | 25.175 MHz |      125 MHz |            5x | __working__  |
+|   640x480   |         60Hz | 25.175 MHz |      150 MHz |            8x | devel        |
+|   640x480   |         60Hz | 25.175 MHz |      175 MHz |            8x | devel        |
+|   640x480   |         60Hz | 25.175 MHz |      200 MHz |            8x | maybe later  |
+| __800x600__ |         60Hz | 40.000 MHz |      120 MHz |            3x | __working__  |
+|   800x600   |         60Hz | 40.000 MHz |      200 MHz |            5x | maybe later  |
+|   800x600   |         85Hz | 56.250 MHz |      225 MHz |            4x | __testing__  |
+|  1024x768   |         70Hz | 75.000 MHz |      225 MHz |            3x | devel        |
 
 
 ## VGA timings
