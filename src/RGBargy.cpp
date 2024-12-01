@@ -13,7 +13,7 @@
 
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
-#include "sm/sm_color_800x600.pio.h"
+#include "sm/sm_color_800x600x120.pio.h"
 
 short mode_width, mode_height;
 short mode_hfrontporch;
@@ -80,12 +80,16 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
             }
             break;
         case RGBG_MODE_800x600:
-            hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
-            vsync_offset = pio_add_program(pio, &sm_vsync_800x600_program);
-            color_offset = pio_add_program(pio, &sm_color_800x600_program);
-            sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN);
-            sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN);
-            sm_color_800x600_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+            switch(cpu_mhz) {
+                case 120:
+                    hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
+                    vsync_offset = pio_add_program(pio, &sm_vsync_800x600_program);
+                    color_offset = pio_add_program(pio, &sm_color_800x600x120_program);
+                    sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 3);
+                    sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 3);
+                    sm_color_800x600x120_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    break;
+            }
             break;
     }
     pio_sm_put_blocking(pio, hsync_sm, hsync_active);
@@ -127,6 +131,17 @@ void RGBargy::pixel(short x, short y, byte color) {
     }
 }
 
+// draw horizontal line from x0, y0 with l in length
+void RGBargy::hline(short x, short y, short l, byte color) {
+    for (int i = 0; i < l; i++) pixel(x + i, y, color);
+}
+
+// draw vertical line from x0, y0 with l in length
+void RGBargy::vline(short x, short y, short l, byte color) {
+    for (int i = 0; i < l; i++) pixel(x, y+i, color);
+}
+
+// draw a line with Bresenham's algorithm
 void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
     short dx, dy, ystep, err;
     short steep = abs(y1 - y0) > abs(x1 - x0);
@@ -171,8 +186,6 @@ int RGBargy::get_mode_bitdepth() {
 };
 int RGBargy::get_cpu_mhz() {
     // delay(5000);
-    // long cpu_mhz = clock_get_hz(clk_sys) / 1000000;
-    // uint cpu_mhz = frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_SYS) / 1000;
-
+    // return frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_SYS) / 1000;
     return clock_get_hz(clk_sys) / 1000000;
 };

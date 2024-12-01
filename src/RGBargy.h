@@ -23,9 +23,13 @@
 class RGBargy {
   public:
     RGBargy(short mode, short cpu_mhz);
+
     void clear();
     void pixel(short x, short y, byte color);
+    void hline(short x, short y, short l, byte color);
+    void vline(short x, short y, short l, byte color);
     void line(short x0, short y0, short x1, short y1, byte color);
+
     int get_mode_width();
     int get_mode_height();
     int get_mode_bitdepth();
