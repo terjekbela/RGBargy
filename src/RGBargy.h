@@ -1,9 +1,9 @@
 #ifndef RGBargy_h
 #define RGBargy_h
 
-#define RGBG_MODE_640x480     1
-#define RGBG_MODE_800x600     2
-#define RGBG_MODE_1024x768    3
+#define RGBG_MODE_640x480  1
+#define RGBG_MODE_800x600  2
+#define RGBG_MODE_1024x768 3
 
 #define RGBG_COLORS_1bit      1
 #define RGBG_COLORS_4bit_1111 2
@@ -22,13 +22,14 @@
 
 class RGBargy {
   public:
-    RGBargy(byte mode);
+    RGBargy(short mode, short cpu_mhz);
     void clear();
     void pixel(short x, short y, byte color);
     void line(short x0, short y0, short x1, short y1, byte color);
     int get_mode_width();
     int get_mode_height();
     int get_mode_bitdepth();
+    int get_cpu_mhz();
   private:
     unsigned char * fb_pointer0;
     int fb_size;
