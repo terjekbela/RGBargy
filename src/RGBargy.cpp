@@ -20,7 +20,8 @@ short mode_hfrontporch;
 
 RGBargy::RGBargy(short mode, short cpu_mhz) {
     // getting cpu frequency for clock division
-    
+    //   todo: implement checking mhz value
+
     // handling resolution-dependent parameters
     int hsync_active, vsync_active, color_active;
     switch(mode) {
@@ -118,11 +119,15 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
     dma_start_channel_mask((1u << color_chan_0)) ;
 }
 
+RGBargy::~RGBargy() {
+    free(fb_pointer0);
+}
+
 void RGBargy::clear() {
     memset(fb_pointer0, 0, fb_size);
 }
 
-void RGBargy::pixel(short x, short y, byte color) {
+void RGBargy::pixel(short x, short y, char color) {
     if (x < 0 || x > mode_width - 1)  return;
     if (y < 0 || y > mode_height - 1) return;
     int pixel = ((mode_width * y) + x);
@@ -134,17 +139,17 @@ void RGBargy::pixel(short x, short y, byte color) {
 }
 
 // draw horizontal line from x0, y0 with l in length
-void RGBargy::hline(short x, short y, short l, byte color) {
+void RGBargy::hline(short x, short y, short l, char color) {
     for (int i = 0; i < l; i++) pixel(x + i, y, color);
 }
 
 // draw vertical line from x0, y0 with l in length
-void RGBargy::vline(short x, short y, short l, byte color) {
+void RGBargy::vline(short x, short y, short l, char color) {
     for (int i = 0; i < l; i++) pixel(x, y+i, color);
 }
 
 // draw a line with Bresenham's algorithm
-void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
+void RGBargy::line(short x0, short y0, short x1, short y1, char color) {
     short dx, dy, ystep, err;
     short steep = abs(y1 - y0) > abs(x1 - x0);
     if (steep) {
@@ -177,14 +182,14 @@ void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
     }
 };
 
-void RGBargy::rect(short x0, short y0, short x1, short y1, byte color) {
+void RGBargy::rect(short x0, short y0, short x1, short y1, char color) {
     hline(x0, y0, x1 - x0, color);
     hline(x0, y1, x1 - x0, color);
     vline(x0, y0, y1 - y0, color);
     vline(x1, y0, y1 - y0, color);
 }
 
-void RGBargy::symm8_plot(int xc, int yc, int x, int y, byte c) {  
+void RGBargy::symm8_plot(int xc, int yc, int x, int y, char c) {  
     pixel( x+xc,  y+yc, c);  
     pixel( x+xc, -y+yc, c);  
     pixel(-x+xc, -y+yc, c);  
@@ -195,7 +200,7 @@ void RGBargy::symm8_plot(int xc, int yc, int x, int y, byte c) {
     pixel(-y+xc,  x+yc, c);  
 }  
 
-void RGBargy::circle(short xc, short yc, short r, byte c) {
+void RGBargy::circle(short xc, short yc, short r, char c) {
     int x=0, y=r, d=3-(2*r);  
     symm8_plot(xc, yc, x, y, c);  
     while(x<=y) {  

@@ -23,14 +23,15 @@
 class RGBargy {
   public:
     RGBargy(short mode, short cpu_mhz);
+    ~RGBargy();
 
     void clear();
-    void pixel(short x, short y, byte color);
-    void hline(short x, short y, short l, byte color);
-    void vline(short x, short y, short l, byte color);
-    void line(short x0, short y0, short x1, short y1, byte color);
-    void rect(short x0, short y0, short x1, short y1, byte color);
-    void circle(short xc, short yc, short r, byte color);
+    void pixel(short x, short y, char color);
+    void hline(short x, short y, short l, char color);
+    void vline(short x, short y, short l, char color);
+    void line(short x0, short y0, short x1, short y1, char color);
+    void rect(short x0, short y0, short x1, short y1, char color);
+    void circle(short xc, short yc, short r, char color);
 
     int get_mode_width();
     int get_mode_height();
@@ -40,7 +41,7 @@ class RGBargy {
     unsigned char * fb_pointer0;
     int fb_size;
 
-    void symm8_plot(int xc, int yc, int x, int y, byte c);
+    void symm8_plot(int xc, int yc, int x, int y, char c);
 };
 
 #endif
