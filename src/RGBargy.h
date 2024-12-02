@@ -29,6 +29,8 @@ class RGBargy {
     void hline(short x, short y, short l, byte color);
     void vline(short x, short y, short l, byte color);
     void line(short x0, short y0, short x1, short y1, byte color);
+    void rect(short x0, short y0, short x1, short y1, byte color);
+    void circle(short xc, short yc, short r, byte color);
 
     int get_mode_width();
     int get_mode_height();
@@ -37,6 +39,8 @@ class RGBargy {
   private:
     unsigned char * fb_pointer0;
     int fb_size;
+
+    void symm8_plot(int xc, int yc, int x, int y, byte c);
 };
 
 #endif

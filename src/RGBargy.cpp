@@ -123,6 +123,8 @@ void RGBargy::clear() {
 }
 
 void RGBargy::pixel(short x, short y, byte color) {
+    if (x < 0 || x > mode_width - 1)  return;
+    if (y < 0 || y > mode_height - 1) return;
     int pixel = ((mode_width * y) + x);
     if (pixel & 1) {
         fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & TOPMASK)    | (color << 4) ;
@@ -174,6 +176,42 @@ void RGBargy::line(short x0, short y0, short x1, short y1, byte color) {
         }
     }
 };
+
+void RGBargy::rect(short x0, short y0, short x1, short y1, byte color) {
+    hline(x0, y0, x1 - x0, color);
+    hline(x0, y1, x1 - x0, color);
+    vline(x0, y0, y1 - y0, color);
+    vline(x1, y0, y1 - y0, color);
+}
+
+void RGBargy::symm8_plot(int xc, int yc, int x, int y, byte c) {  
+    pixel( x+xc,  y+yc, c);  
+    pixel( x+xc, -y+yc, c);  
+    pixel(-x+xc, -y+yc, c);  
+    pixel(-x+xc,  y+yc, c);  
+    pixel( y+xc,  x+yc, c);  
+    pixel( y+xc, -x+yc, c);  
+    pixel(-y+xc, -x+yc, c);  
+    pixel(-y+xc,  x+yc, c);  
+}  
+
+void RGBargy::circle(short xc, short yc, short r, byte c) {
+    int x=0, y=r, d=3-(2*r);  
+    symm8_plot(xc, yc, x, y, c);  
+    while(x<=y) {  
+        if(d<=0) {  
+            d=d+(4*x)+6;  
+        } else {  
+            d=d+(4*x)-(4*y)+10;  
+            y=y-1;  
+        }  
+        x=x+1;  
+        symm8_plot(xc, yc, x, y, c);
+    }  
+}  
+
+
+
 
 int RGBargy::get_mode_width() {
     return mode_width;
