@@ -76,6 +76,9 @@ The table below shows sync polarity, front porch, sync pulse and back porch leng
 ### Docs
 https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html
 
-
-## License
-- [MIT license](https://mit-license.org/)
+## Licensing and Credits
+- __RGBargy__ licensed under [MIT license](https://mit-license.org/)
+- The __Arduino IDE__ and __ArduinoCore-API__ are developed and maintained by the Arduino team. The IDE is licensed under [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
+- The __RP2040 GCC-based toolchain__ is licensed under the [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
+- The __Pico-SDK__ is by Raspberry Pi (Trading) Ltd and licensed under the [BSD 3-Clause license](https://opensource.org/license/bsd-3-clause).
+- __Arduino-Pico__ core files are licensed under the [LGPL](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html).
