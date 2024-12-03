@@ -1,4 +1,4 @@
-.program vgahsync_640x480
+.program sm_hsync_640x480
 
 
 
@@ -23,10 +23,10 @@ backporch:                        ; back porch for 32+13+2 = 47 cycles
 
 
 % c-sdk {
-static inline void vgahsync_640x480_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = vgahsync_640x480_program_get_default_config(offset);
+static inline void sm_hsync_640x480_program_init(PIO pio, uint sm, uint offset, uint pin, uint clkdiv) {
+    pio_sm_config c = sm_hsync_640x480_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
-    sm_config_set_clkdiv(&c, 5) ;
+    sm_config_set_clkdiv(&c, clkdiv) ;
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     pio_sm_init(pio, sm, offset, &c);
