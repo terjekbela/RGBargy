@@ -182,14 +182,21 @@ void RGBargy::line(short x0, short y0, short x1, short y1, char color) {
     }
 };
 
-void RGBargy::rect(short x0, short y0, short x1, short y1, char color) {
-    hline(x0, y0, x1 - x0, color);
-    hline(x0, y1, x1 - x0, color);
-    vline(x0, y0, y1 - y0, color);
-    vline(x1, y0, y1 - y0, color);
+// draw a rectangle, filled or not
+void RGBargy::rect(short x0, short y0, short x1, short y1, char color, bool fill) {
+    if(!fill) {
+        hline(x0, y0, x1 - x0, color);
+        hline(x0, y1, x1 - x0, color);
+        vline(x0, y0, y1 - y0, color);
+        vline(x1, y0, y1 - y0, color);
+    } else {
+        for (int i = y0; i <= y1; i++) {
+            hline(x0, i, x1 - x0, color);
+        }
+    }
 }
 
-void RGBargy::symm8_plot(int xc, int yc, int x, int y, char c) {  
+void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {  
     pixel( x+xc,  y+yc, c);  
     pixel( x+xc, -y+yc, c);  
     pixel(-x+xc, -y+yc, c);  
