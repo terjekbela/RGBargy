@@ -1,16 +1,19 @@
 #include <RGBargy.h>
 
-RGBargy rgbg(RGBG_MODE_640x480);
+// Check cpu freq when setting resolution!
+RGBargy rgbg(RGBG_MODE_640x480,     125);
+// RGBargy rgbg(RGBG_MODE_800x600,  120);
+// RGBargy rgbg(RGBG_MODE_1024x768, 175);
+
+short w = rgbg.get_mode_width();
+short h = rgbg.get_mode_height();
 
 void setup() {
   randomSeed(analogRead(0));
 }
 
 void loop() {
-  rgbg.line(
-    random(640), random(480),
-    random(640), random(480),
-    random(7)+1
-  );
+  rgbg.line(r(w), r(h), r(w), r(h), r(7)+1);
   delay(1);
 }
+int r(int r) {return random(r);}
