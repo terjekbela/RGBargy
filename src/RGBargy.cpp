@@ -9,7 +9,6 @@
 #include "sm/sm_vsync_640x480.pio.h"
 #include "sm/sm_color_640x480x125.pio.h"
 #include "sm/sm_color_640x480x150.pio.h"
-#include "sm/sm_color_640x480x175.pio.h"
 
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
@@ -35,6 +34,11 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
             mode_height      = 600;
             mode_hfrontporch = 40;
             break;
+        case RGBG_MODE_1024x768:
+            mode_width       = 1024;
+            mode_height      = 768;
+            mode_hfrontporch = 24;
+            break;
     }
     hsync_active = mode_width + mode_hfrontporch - 1;
     vsync_active = mode_height - 1;
@@ -53,38 +57,34 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
     uint hsync_offset, vsync_offset, color_offset;
     switch(mode) {
         case RGBG_MODE_640x480:
+            hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
+            vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
             switch(cpu_mhz) {
                 case 125:
-                    hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
-                    vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
                     color_offset = pio_add_program(pio, &sm_color_640x480x125_program);
                     sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 5);
                     sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 5);
                     sm_color_640x480x125_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
                 case 150:
-//                    hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
-//                    vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
-//                    color_offset = pio_add_program(pio, &sm_color_640x480x150_program);
-//                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 6);
-//                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 6);
-//                    sm_color_640x480x150_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    color_offset = pio_add_program(pio, &sm_color_640x480x150_program);
+                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 6);
+                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 6);
+                    sm_color_640x480x150_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
                 case 175:
-                    hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
-                    vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
-                    color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
-                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 7);
-                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 7);
-                    sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+//                    color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
+//                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 7);
+//                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 7);
+//                    sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
             break;
         case RGBG_MODE_800x600:
+            hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
+            vsync_offset = pio_add_program(pio, &sm_vsync_800x600_program);
             switch(cpu_mhz) {
                 case 120:
-                    hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
-                    vsync_offset = pio_add_program(pio, &sm_vsync_800x600_program);
                     color_offset = pio_add_program(pio, &sm_color_800x600x120_program);
                     sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 3);
                     sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 3);

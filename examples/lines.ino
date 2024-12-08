@@ -13,7 +13,7 @@ void setup() {
 }
 
 void loop() {
-  rgbg.line(r(w), r(h), r(w), r(h), r(7)+1);
+  rgbg.line(r(w), r(h), r(w), r(h), r(15)+1);
   delay(1);
 }
 int r(int r) {return random(r);}

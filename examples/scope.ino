@@ -13,7 +13,7 @@ void setup() {
 }
 
 void loop() {
-  byte  c = random(7)+1;
+  byte  c = random(15)+1;
   rgbg.rect(0, 0, w-1, h-1, c);
   rgbg.line(0, 0, w-1, h-1, c);
   rgbg.line(w-1, 0, 0, h-1, c);

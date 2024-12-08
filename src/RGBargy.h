@@ -5,16 +5,19 @@
 #define RGBG_MODE_800x600  2
 #define RGBG_MODE_1024x768 3
 
-#define RGBG_COLORS_1bit      1
-#define RGBG_COLORS_4bit_1111 2
-#define RGBG_COLORS_4bit_121  3
-#define RGBG_COLORS_8bit_332  4
-#define RGBG_COLORS_8bit_2222 5
-#define RGBG_COLORS_16bit_565 6
+#define RGBG_COLORS_1bit_i         1
+#define RGBG_COLORS_4bit_rgbi      2
+#define RGBG_COLORS_4bit_rggb      3
+#define RGBG_COLORS_8bit_rrrgggbb  4
+#define RGBG_COLORS_8bit_rrggbbii  5
 
-#define RGBG_HSYNC_PIN  4
-#define RGBG_VSYNC_PIN  5
-#define RGBG_COLOR_PINS 6
+// #define RGBG_HSYNC_PIN  4
+// #define RGBG_VSYNC_PIN  5
+// #define RGBG_COLOR_PINS 6
+
+#define RGBG_HSYNC_PIN  21
+#define RGBG_VSYNC_PIN  20
+#define RGBG_COLOR_PINS 16
 
 #define SWAP(a, b) { short t = a; a = b; b = t; }
 #define TOPMASK    0b00001111

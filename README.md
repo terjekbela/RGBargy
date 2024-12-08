@@ -22,14 +22,15 @@ int r(int r) {return random(r);}
 
 ## Hardware connections / pinout
 
-| RP2040 GPIO pin | VGA connector pin |
-|-----------------|-------------------|
-| GPIO 4          | Horizontal sync   |
-| GPIO 5          | Vertical sync     |
-| GPIO 6          | Red   (w/330R)    |
-| GPIO 7          | Green (w/330R)    |
-| GPIO 8          | Blue  (w/330R)    |
-| GND             | GND               |
+| RP2350 GPIO pin | connected |      | VGA connector pin    |
+|-----------------|-----------|------|----------------------|
+| GPIO 16         | 330R      |  ->  |  1 - Red             |
+| GPIO 17         | 330R      |  ->  |  2 - Green           |
+| GPIO 18         | 330R      |  ->  |  3 - Blue            |
+| GPIO 19         | 3x470R    | -^^^ |  1,2,3 pins          |
+| GPIO 20         |           |  ->  |  x - Vertical sync   |
+| GPIO 21         |           |  ->  |  x - Horizontal sync |
+| GND             |           |  ->  | 15  GND              |
 
 
 ## Supported resolutions
@@ -41,13 +42,13 @@ Please note that in the current version you actually need to pass the selected c
 | Resolution  | Refresh rate | Pixel freq | set CPU freq | Clock divider | Dev status   |
 |-------------|-------------:|-----------:|-------------:|--------------:|--------------|
 | __640x480__ |         60Hz | 25.175 MHz |      125 MHz |            5x | __working__  |
-|   640x480   |         60Hz | 25.175 MHz |      150 MHz |            8x | devel        |
-|   640x480   |         60Hz | 25.175 MHz |      175 MHz |            8x | devel        |
-|   640x480   |         60Hz | 25.175 MHz |      200 MHz |            8x | maybe later  |
+| __640x480__ |         60Hz | 25.175 MHz |      150 MHz |            8x | __working__  |
+|   640x480   |         60Hz | 25.175 MHz |      175 MHz |            8x | development  |
+|   640x480   |         60Hz | 25.175 MHz |      200 MHz |            8x | development  |
 | __800x600__ |         60Hz | 40.000 MHz |      120 MHz |            3x | __working__  |
-|   800x600   |         60Hz | 40.000 MHz |      200 MHz |            5x | maybe later  |
-|   800x600   |         85Hz | 56.250 MHz |      225 MHz |            4x | __testing__  |
-|  1024x768   |         70Hz | 75.000 MHz |      225 MHz |            3x | devel        |
+|   800x600   |         60Hz | 40.000 MHz |      200 MHz |            5x | development  |
+|   800x600   |         85Hz | 56.250 MHz |      225 MHz |            4x | development  |
+|  1024x768   |         70Hz | 75.000 MHz |      225 MHz |            3x | development  |
 
 
 ## VGA timings
