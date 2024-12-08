@@ -39,11 +39,11 @@ static inline pio_sm_config sm_vsync_800x600_program_get_default_config(uint off
     return c;
 }
 
-static inline void sm_vsync_800x600_program_init(PIO pio, uint sm, uint offset, uint pin) {
+static inline void sm_vsync_800x600_program_init(PIO pio, uint sm, uint offset, uint pin, uint clkdiv) {
     pio_sm_config c = sm_vsync_800x600_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_sideset_pins(&c, pin);
-    sm_config_set_clkdiv(&c, 3);
+    sm_config_set_clkdiv(&c, clkdiv);
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     pio_sm_init(pio, sm, offset, &c);

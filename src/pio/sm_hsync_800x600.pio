@@ -1,0 +1,35 @@
+.program sm_hsync_800x600
+
+
+
+pull block                        ; get active + hfront length (once)
+.wrap_target
+
+mov x, osr
+activehporch:                     ; active area + hfront porch loop
+    jmp x-- activehporch 
+
+set x, 3
+hsync:                            ; hsync pulse for 4*32 = 128 cycles
+    set pins, 1 [31]              ; hsync signal is POSITIVE
+    jmp x-- hsync 
+
+backporch:                        ; back porch for 32+32+24 = 88 cycles
+    set pins, 0 [31]
+    set pins, 0 [31]
+    set pins, 0 [23]
+    irq 0       [1]
+.wrap
+
+
+
+% c-sdk {
+static inline void sm_hsync_800x600_program_init(PIO pio, uint sm, uint offset, uint pin, uint clkdiv) {
+    pio_sm_config c = sm_hsync_800x600_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_clkdiv(&c, clkdiv) ;
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
