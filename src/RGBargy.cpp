@@ -9,20 +9,20 @@
 #include "sm/sm_vsync_640x480.pio.h"
 #include "sm/sm_color_640x480x125.pio.h"
 #include "sm/sm_color_640x480x150.pio.h"
+#include "sm/sm_color_640x480x175.pio.h"
 
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
 
-short mode_width, mode_height;
-short mode_hfrontporch;
+short mode, mode_width, mode_height, mode_hfrontporch;
+int hsync_active, vsync_active, color_active;
 
-RGBargy::RGBargy(short mode, short cpu_mhz) {
-    // getting cpu frequency for clock division
-    //   todo: implement checking mhz value
+RGBargy::RGBargy(short mode_) {
+    // storing mode
+    mode = mode_;
 
-    // handling resolution-dependent parameters
-    int hsync_active, vsync_active, color_active;
+    // setting up resolution-dependent parameters
     switch(mode) {
         case RGBG_MODE_640x480:
             mode_width       = 640;
@@ -44,10 +44,20 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
     vsync_active = mode_height - 1;
     color_active = mode_width / 2 - 1;
 
-    // allocating framebuffer based on resolution
-    fb_size     = mode_width * mode_height / 2;
+    // allocating framebuffer based on res and color depth
+    fb_size     = mode_width * mode_height / 2; // (/2 == 4-bit)
     fb_pointer0 = (unsigned char *)malloc(fb_size);
-    memset(fb_pointer0, 0, fb_size);
+    memset(fb_pointer0, 0, fb_size);    
+}
+
+RGBargy::~RGBargy() {
+    // releasing framebuffer memory
+    free(fb_pointer0);
+}
+
+void RGBargy::begin() {
+    // getting cpu frequency for clock division
+    int cpu_mhz = get_cpu_mhz();
 
     // setting up pio machines
     PIO pio = pio0;
@@ -73,10 +83,10 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
                     sm_color_640x480x150_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
                 case 175:
-//                    color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
-//                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 7);
-//                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 7);
-//                    sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
+                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 7);
+                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 7);
+                    sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
             break;
@@ -119,14 +129,12 @@ RGBargy::RGBargy(short mode, short cpu_mhz) {
     dma_start_channel_mask((1u << color_chan_0)) ;
 }
 
-RGBargy::~RGBargy() {
-    free(fb_pointer0);
-}
-
+// clear the framebuffer with zero color
 void RGBargy::clear() {
     memset(fb_pointer0, 0, fb_size);
 }
 
+// draw a pixel at x, y with color
 void RGBargy::pixel(short x, short y, char color) {
     if (x < 0 || x > mode_width - 1)  return;
     if (y < 0 || y > mode_height - 1) return;
@@ -196,6 +204,7 @@ void RGBargy::rect(short x0, short y0, short x1, short y1, char color, bool fill
     }
 }
 
+// 8-way symmetric helper function for circle drawing
 void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {  
     pixel( x+xc,  y+yc, c);  
     pixel( x+xc, -y+yc, c);  
@@ -207,6 +216,7 @@ void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {
     pixel(-y+xc,  x+yc, c);  
 }  
 
+// draw a circle with the midpoint circle algorithm
 void RGBargy::circle(short xc, short yc, short r, char c) {
     int x=0, y=r, d=3-(2*r);  
     symm8_plot(xc, yc, x, y, c);  
@@ -224,18 +234,23 @@ void RGBargy::circle(short xc, short yc, short r, char c) {
 
 
 
-
+// return mode width
 int RGBargy::get_mode_width() {
     return mode_width;
 };
+
+// return mode height
 int RGBargy::get_mode_height() {
     return mode_height;
 };
+
+// return mode bitdepth
 int RGBargy::get_mode_bitdepth() {
     return 3;
 };
+
+// return cpu frequency in MHz
 int RGBargy::get_cpu_mhz() {
-    // delay(5000);
-    // return frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_SYS) / 1000;
+    //return frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_SYS) / 1000;
     return clock_get_hz(clk_sys) / 1000000;
 };

@@ -25,9 +25,10 @@
 
 class RGBargy {
   public:
-    RGBargy(short mode, short cpu_mhz);
+    RGBargy(short mode_);
     ~RGBargy();
 
+    void begin();
     void clear();
     void pixel(short x, short y, char color);
     void hline(short x, short y, short l, char color);
@@ -40,9 +41,11 @@ class RGBargy {
     int get_mode_height();
     int get_mode_bitdepth();
     int get_cpu_mhz();
+
   private:
-    unsigned char * fb_pointer0;
+    short mode, mode_width, mode_height, mode_hfrontporch;
     int fb_size;
+    unsigned char * fb_pointer0;
     void symm8_plot(short xc, short yc, short x, short y, char c);
 };
 
