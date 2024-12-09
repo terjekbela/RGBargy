@@ -7,14 +7,15 @@ This is an Arduino library providing a VGA display-driver for the RP2* family of
 ```
 #include <RGBargy.h>
 
-RGBargy rgbg(RGBG_MODE_640x480, 125);
+RGBargy rgbg(RGBG_MODE_640x480);
 
 void setup() {
   randomSeed(analogRead(0));
+  rgbg.begin();
 }
 
 void loop() {
-    rgbg.line(r(640), r(480), r(640), r(480), r(8));
+    rgbg.line(r(640), r(480), r(640), r(480), r(15)+1);
     delay(1);
 }
 int r(int r) {return random(r);}
@@ -35,20 +36,19 @@ int r(int r) {return random(r);}
 
 ## Supported resolutions
 
-For this library to work, the CPU frequency has to be selected manually in the Arduino IDE to match the resolution used in the code. The CPU frequency must be an integer multiple of the pixel frequencies below. See "CPU freq" column.
+For this library to work, the CPU frequency has to be selected manually in the Arduino IDE to match the resolution used in the code. The CPU frequency must be an integer multiple of the pixel frequencies below. See "Pixel freq" and "CPU freq" column. (note: for 25.175Mhz pixel frequency, the round 25MHz cpu frequency is apparently good enough)
 
-Please note that in the current version you actually need to pass the selected cpu freq in the constructor, because it's tricky to get an correct result from the pico api right now.
-
-| Resolution  | Refresh rate | Pixel freq | set CPU freq | Clock divider | Dev status   |
-|-------------|-------------:|-----------:|-------------:|--------------:|--------------|
-| __640x480__ |         60Hz | 25.175 MHz |      125 MHz |            5x | __working__  |
-| __640x480__ |         60Hz | 25.175 MHz |      150 MHz |            8x | __working__  |
-|   640x480   |         60Hz | 25.175 MHz |      175 MHz |            8x | development  |
-|   640x480   |         60Hz | 25.175 MHz |      200 MHz |            8x | development  |
-| __800x600__ |         60Hz | 40.000 MHz |      120 MHz |            3x | __working__  |
-|   800x600   |         60Hz | 40.000 MHz |      200 MHz |            5x | development  |
-|   800x600   |         85Hz | 56.250 MHz |      225 MHz |            4x | development  |
-|  1024x768   |         70Hz | 75.000 MHz |      225 MHz |            3x | development  |
+| Resolution  | Refresh rate | Pixel freq |  CPU freq | Clock divider | Dev status   |
+|-------------|-------------:|-----------:|----------:|--------------:|--------------|
+| __640x480__ |         60Hz | 25.175 MHz |   100 MHz |            4x | __working__  |
+| __640x480__ |         60Hz | 25.175 MHz |   125 MHz |            5x | __working__  |
+| __640x480__ |         60Hz | 25.175 MHz |   150 MHz |            6x | __working__  |
+|   640x480   |         60Hz | 25.175 MHz |   175 MHz |            7x | __testing__  |
+|   640x480   |         60Hz | 25.175 MHz |   200 MHz |            8x |              |
+| __800x600__ |         60Hz | 40.000 MHz |   120 MHz |            3x | __working__  |
+|   800x600   |         60Hz | 40.000 MHz |   200 MHz |            5x | __testing__  |
+|   800x600   |         85Hz | 56.250 MHz |   225 MHz |            4x |              |
+|  1024x768   |         70Hz | 75.000 MHz |   225 MHz |            3x |              |
 
 
 ## VGA timings

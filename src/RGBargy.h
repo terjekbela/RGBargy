@@ -20,8 +20,6 @@
 #define RGBG_COLOR_PINS 16
 
 #define SWAP(a, b) { short t = a; a = b; b = t; }
-#define TOPMASK    0b00001111
-#define BOTTOMMASK 0b11110000
 
 class RGBargy {
   public:

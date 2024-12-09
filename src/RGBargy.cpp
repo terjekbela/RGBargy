@@ -1,16 +1,14 @@
 #include "Arduino.h"
-#include "pico/stdlib.h"
-#include "hardware/pio.h"
-#include "hardware/dma.h"
+#include "hardware/vreg.h"
 #include "hardware/clocks.h"
 
 #include "RGBargy.h"
 #include "sm/sm_hsync_640x480.pio.h"
 #include "sm/sm_vsync_640x480.pio.h"
+#include "sm/sm_color_640x480x100.pio.h"
 #include "sm/sm_color_640x480x125.pio.h"
 #include "sm/sm_color_640x480x150.pio.h"
 #include "sm/sm_color_640x480x175.pio.h"
-
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
@@ -19,6 +17,12 @@ short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
 
 RGBargy::RGBargy(short mode_) {
+    // core voltage and mhz settings
+    // vreg_set_voltage(VREG_VOLTAGE_1_20);
+    // delay(10);
+    // set_sys_clock_khz(175000, true);
+    // delay(10);
+
     // storing mode
     mode = mode_;
 
@@ -70,25 +74,25 @@ void RGBargy::begin() {
             hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
             vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
             switch(cpu_mhz) {
+                case 100:
+                    color_offset = pio_add_program(pio, &sm_color_640x480x100_program);
+                    sm_color_640x480x100_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    break;
                 case 125:
                     color_offset = pio_add_program(pio, &sm_color_640x480x125_program);
-                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 5);
-                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 5);
                     sm_color_640x480x125_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
                 case 150:
                     color_offset = pio_add_program(pio, &sm_color_640x480x150_program);
-                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 6);
-                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 6);
                     sm_color_640x480x150_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
                 case 175:
                     color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
-                    sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 7);
-                    sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 7);
                     sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
+            sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 25);
+            sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 25);
             break;
         case RGBG_MODE_800x600:
             hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
@@ -96,11 +100,11 @@ void RGBargy::begin() {
             switch(cpu_mhz) {
                 case 120:
                     color_offset = pio_add_program(pio, &sm_color_800x600x120_program);
-                    sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, 3);
-                    sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, 3);
                     sm_color_800x600x120_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
+            sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 40);
+            sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 40);
             break;
     }
     pio_sm_put_blocking(pio, hsync_sm, hsync_active);
@@ -140,9 +144,9 @@ void RGBargy::pixel(short x, short y, char color) {
     if (y < 0 || y > mode_height - 1) return;
     int pixel = ((mode_width * y) + x);
     if (pixel & 1) {
-        fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & TOPMASK)    | (color << 4) ;
+        fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (color << 4) ;
     } else {
-        fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & BOTTOMMASK) | (color) ;
+        fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (color) ;
     }
 }
 
