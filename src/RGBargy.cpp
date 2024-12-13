@@ -13,6 +13,7 @@
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
+#include "sm/sm_color_800x600x200.pio.h"
 
 short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
@@ -106,6 +107,10 @@ void RGBargy::begin() {
                 case 120:
                     color_offset = pio_add_program(pio, &sm_color_800x600x120_program);
                     sm_color_800x600x120_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    break;
+                case 200:
+                    color_offset = pio_add_program(pio, &sm_color_800x600x200_program);
+                    sm_color_800x600x200_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
             sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 40);
