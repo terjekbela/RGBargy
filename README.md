@@ -44,9 +44,9 @@ For this library to work, the CPU frequency has to be selected manually in the A
 | __640x480__ |         60Hz | 25.175 MHz |   125 MHz |            5x | __working__  |
 | __640x480__ |         60Hz | 25.175 MHz |   150 MHz |            6x | __working__  |
 |   640x480   |         60Hz | 25.175 MHz |   175 MHz |            7x | __testing__  |
-|   640x480   |         60Hz | 25.175 MHz |   200 MHz |            8x |              |
+| __640x480__ |         60Hz | 25.175 MHz |   200 MHz |            8x | __working__  |
 | __800x600__ |         60Hz | 40.000 MHz |   120 MHz |            3x | __working__  |
-|   800x600   |         60Hz | 40.000 MHz |   200 MHz |            5x | __testing__  |
+| __800x600__ |         60Hz | 40.000 MHz |   200 MHz |            5x | __working__  |
 |   800x600   |         85Hz | 56.250 MHz |   225 MHz |            4x |              |
 |  1024x768   |         70Hz | 75.000 MHz |   225 MHz |            3x |              |
 
