@@ -9,6 +9,7 @@
 #include "sm/sm_color_640x480x125.pio.h"
 #include "sm/sm_color_640x480x150.pio.h"
 #include "sm/sm_color_640x480x175.pio.h"
+#include "sm/sm_color_640x480x200.pio.h"
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
@@ -89,6 +90,10 @@ void RGBargy::begin() {
                 case 175:
                     color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
                     sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    break;
+                case 200:
+                    color_offset = pio_add_program(pio, &sm_color_640x480x200_program);
+                    sm_color_640x480x200_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
             sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 25);
