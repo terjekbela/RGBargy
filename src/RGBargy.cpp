@@ -15,6 +15,7 @@
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
 #include "sm/sm_color_800x600x200.pio.h"
+//#include "sm/sm_color_800x600x240.pio.h"
 
 short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
@@ -116,6 +117,10 @@ void RGBargy::begin() {
                 case 200:
                     color_offset = pio_add_program(pio, &sm_color_800x600x200_program);
                     sm_color_800x600x200_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    break;
+                case 240:
+                    color_offset = pio_add_program(pio, &sm_color_800x600x240_program);
+                    sm_color_800x600x240_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
                     break;
             }
             sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 40);
@@ -224,21 +229,21 @@ void RGBargy::rect(short x0, short y0, short x1, short y1, char color, bool fill
 }
 
 // 8-way symmetric helper function for circle drawing
-void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {  
-    pixel( x+xc,  y+yc, c);  
-    pixel( x+xc, -y+yc, c);  
-    pixel(-x+xc, -y+yc, c);  
-    pixel(-x+xc,  y+yc, c);  
-    pixel( y+xc,  x+yc, c);  
-    pixel( y+xc, -x+yc, c);  
-    pixel(-y+xc, -x+yc, c);  
-    pixel(-y+xc,  x+yc, c);  
-}  
+void RGBargy::symm8_plot(short xc, short yc, short x, short y, char color) {  
+    pixel( x+xc,  y+yc, color);
+    pixel( x+xc, -y+yc, color);
+    pixel(-x+xc, -y+yc, color);
+    pixel(-x+xc,  y+yc, color);
+    pixel( y+xc,  x+yc, color);
+    pixel( y+xc, -x+yc, color);
+    pixel(-y+xc, -x+yc, color);
+    pixel(-y+xc,  x+yc, color);
+}
 
 // draw a circle with the midpoint circle algorithm
-void RGBargy::circle(short xc, short yc, short r, char c) {
+void RGBargy::circle(short xc, short yc, short r, char color) {
     int x=0, y=r, d=3-(2*r);  
-    symm8_plot(xc, yc, x, y, c);  
+    symm8_plot(xc, yc, x, y, color);  
     while(x<=y) {  
         if(d<=0) {  
             d=d+(4*x)+6;  
@@ -247,7 +252,7 @@ void RGBargy::circle(short xc, short yc, short r, char c) {
             y=y-1;  
         }  
         x=x+1;  
-        symm8_plot(xc, yc, x, y, c);
+        symm8_plot(xc, yc, x, y, color);
     }  
 }  
 

@@ -11,10 +11,6 @@
 #define RGBG_COLORS_8bit_rrrgggbb  4
 #define RGBG_COLORS_8bit_rrggbbii  5
 
-// #define RGBG_HSYNC_PIN  4
-// #define RGBG_VSYNC_PIN  5
-// #define RGBG_COLOR_PINS 6
-
 #define RGBG_HSYNC_PIN  21
 #define RGBG_VSYNC_PIN  20
 #define RGBG_COLOR_PINS 16
