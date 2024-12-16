@@ -5,7 +5,7 @@
 #define RGBG_MODE_800x600  2
 #define RGBG_MODE_1024x768 3
 
-#define RGBG_COLORS_1bit_i         1
+#define RGBG_COLORS_4bit_iiii      1
 #define RGBG_COLORS_4bit_rgbi      2
 #define RGBG_COLORS_4bit_rggb      3
 #define RGBG_COLORS_8bit_rrrgggbb  4
