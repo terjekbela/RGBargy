@@ -43,11 +43,14 @@ For this library to work, the CPU frequency has to be selected manually in the A
 | __640x480__ |         60Hz | 25.175 MHz |   100 MHz |            4x | __working__  |
 | __640x480__ |         60Hz | 25.175 MHz |   125 MHz |            5x | __working__  |
 | __640x480__ |         60Hz | 25.175 MHz |   150 MHz |            6x | __working__  |
-|   640x480   |         60Hz | 25.175 MHz |   175 MHz |            7x | __testing__  |
+|   640x480   |         60Hz | 25.175 MHz |   175 MHz |            7x | testing      |
 | __640x480__ |         60Hz | 25.175 MHz |   200 MHz |            8x | __working__  |
+| __640x480__ |         60Hz | 25.175 MHz |   225 MHz |            9x | __working__  |
+| __640x480__ |         60Hz | 25.175 MHz |   250 MHz |           10x | devel        |
 | __800x600__ |         60Hz | 40.000 MHz |   120 MHz |            3x | __working__  |
 | __800x600__ |         60Hz | 40.000 MHz |   200 MHz |            5x | __working__  |
-|   800x600   |         85Hz | 56.250 MHz |   225 MHz |            4x |              |
+|   800x600   |         85Hz | 56.250 MHz |   225 MHz |            4x | devel        |
+|   800x600   |         60Hz | 40.000 MHz |   240 MHz |            6x | __working__  |
 |  1024x768   |         70Hz | 75.000 MHz |   225 MHz |            3x |              |
 
 
@@ -58,8 +61,8 @@ The table below shows sync polarity, front porch, sync pulse and back porch leng
 | Resolution | Refresh rate | Horizontal |       |      |      | Vertical |       |      |      |
 |------------|-------------:|-----------:|------:|-----:|-----:|:--------:|------:|-----:|-----:|
 |            |              | polarity   | front | sync | back | polarity | front | sync | back |
-|   640x480  |         60Hz |    ---     |    16 |   96 |   48 |   ---    |    10 |    2 |   33 |
-|   800x600  |         60Hz |    +++     |    40 |  128 |   88 |   +++    |     1 |    4 |   23 |
+| __640x480__|         60Hz |    ---     |    16 |   96 |   48 |   ---    |    10 |    2 |   33 |
+| __800x600__|         60Hz |    +++     |    40 |  128 |   88 |   +++    |     1 |    4 |   23 |
 |   800x600  |         85Hz |    +++     |    32 |   64 |  152 |   +++    |     1 |    3 |   27 |
 |  1024x768  |         70Hz |    ---     |    24 |  136 |  144 |   ---    |     3 |    6 |   29 |
 
