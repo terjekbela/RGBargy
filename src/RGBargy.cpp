@@ -15,7 +15,10 @@
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
 #include "sm/sm_color_800x600x200.pio.h"
-//#include "sm/sm_color_800x600x240.pio.h"
+#include "sm/sm_color_800x600x240.pio.h"
+#include "sm/sm_hsync_1024x768.pio.h"
+#include "sm/sm_vsync_1024x768.pio.h"
+#include "sm/sm_color_1024x768x225.pio.h"
 
 short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
@@ -125,6 +128,18 @@ void RGBargy::begin() {
             }
             sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 40);
             sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 40);
+            break;
+        case RGBG_MODE_1024x768:
+            hsync_offset = pio_add_program(pio, &sm_hsync_1024x768_program);
+            vsync_offset = pio_add_program(pio, &sm_vsync_1024x768_program);
+            switch(cpu_mhz) {
+                case 225:
+                    color_offset = pio_add_program(pio, &sm_color_1024x768x225_program);
+                    sm_color_1024x768x225_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    break;
+            }
+            sm_hsync_1024x768_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 75);
+            sm_vsync_1024x768_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 75);
             break;
     }
     pio_sm_put_blocking(pio, hsync_sm, hsync_active);
