@@ -1,0 +1,45 @@
+.program sm_vsync_1024x768
+.side_set 1 opt
+
+
+
+pull block                        ; get active + vfront length (once)
+.wrap_target
+
+mov x, osr
+activefront:                      ; active area + vfront porch loop
+    wait 1 irq 0
+    irq 1
+    jmp x-- activefront
+
+;set y, 2
+frontporch:
+    wait 1 irq 0
+    wait 1 irq 0
+;    jmp y-- frontporch
+
+set x, 5           side 0         ; vsync pulse for 6 cycles
+vsync:                            ; vsync signal is NEGATIVE
+    wait 1 irq 0
+    jmp x-- vsync
+
+set x, 26
+backporch:
+    wait 1 irq 0   side 1         ; back porch for 27+2 = 29 cycles
+    jmp x-- backporch
+
+.wrap
+
+
+
+% c-sdk {
+static inline void sm_vsync_1024x768_program_init(PIO pio, uint sm, uint offset, uint pin, uint clkdiv) {
+    pio_sm_config c = sm_vsync_1024x768_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_sideset_pins(&c, pin);
+    sm_config_set_clkdiv(&c, clkdiv);
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
