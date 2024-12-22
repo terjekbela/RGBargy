@@ -12,12 +12,13 @@ activefront:                      ; active area + vfront porch loop
     irq 1
     jmp x-- activefront
 
+
 frontporch:
     wait 1 irq 0
 
-set pins, 1                       ; vsync pulse for 4 cycles
-set x, 3
-vsync:
+
+set x, 3           side 1         ; vsync pulse for 4 cycles
+vsync:                            ; vsync signal is POSITIVE
     wait 1 irq 0
     jmp x-- vsync
 
