@@ -245,33 +245,84 @@ void RGBargy::rect(short x0, short y0, short x1, short y1, char color, bool fill
 
 // 8-way symmetric helper function for circle drawing
 void RGBargy::symm8_plot(short xc, short yc, short x, short y, char color) {  
-    pixel( x+xc,  y+yc, color);
-    pixel( x+xc, -y+yc, color);
-    pixel(-x+xc, -y+yc, color);
-    pixel(-x+xc,  y+yc, color);
-    pixel( y+xc,  x+yc, color);
-    pixel( y+xc, -x+yc, color);
-    pixel(-y+xc, -x+yc, color);
-    pixel(-y+xc,  x+yc, color);
+    pixel(xc + x, yc + y, color);
+    pixel(xc + x, yc - y, color);
+    pixel(xc - x, yc - y, color);
+    pixel(xc - x, yc + y, color);
+    pixel(xc + y, yc + x, color);
+    pixel(xc + y, yc - x, color);
+    pixel(xc - y, yc - x, color);
+    pixel(xc - y, yc + x, color);
+}
+
+// 4-way symmetric helper function for ellipse drawing
+void RGBargy::symm4_plot(short xc, short yc, short x, short y, char color) {  
+    pixel(xc + x, yc + y, color);
+    pixel(xc - x, yc + y, color);
+    pixel(xc + x, yc - y, color);
+    pixel(xc - x, yc - y, color);
 }
 
 // draw a circle with the midpoint circle algorithm
 void RGBargy::circle(short xc, short yc, short r, char color) {
-    int x=0, y=r, d=3-(2*r);  
+    int x=0, y=r, d=3 - (2 * r);  
     symm8_plot(xc, yc, x, y, color);  
     while(x<=y) {  
         if(d<=0) {  
-            d=d+(4*x)+6;  
+            d+= (4*x)+6;  
         } else {  
-            d=d+(4*x)-(4*y)+10;  
-            y=y-1;  
+            d+=(4*x)-(4*y)+10;  
+            y--;  
         }  
-        x=x+1;  
+        x++;  
         symm8_plot(xc, yc, x, y, color);
     }  
 }  
 
-
+// draw an ellipse with the midpoint ellipse algorithm
+void RGBargy::ellipse(short xc, short yc, short rx, short ry, char color) {
+    float rx1, ry1, rx2, ry2;
+    int p, x, y, px, py;
+    ry1 = ry * ry;
+    rx1 = rx * rx;
+    ry2 =  2 * ry1;
+    rx2 =  2 * rx1;
+    x   = 0;
+    y   = ry;
+    symm4_plot(xc, yc, x, y, color);
+    px = 0;
+    py = rx2 * y;
+    p  = (ry1 - rx1 * ry + (0.25 * rx1));
+    while(px < py) {
+        x=x+1;
+        px=px+ry2;
+        if(p >= 0) {
+            y  =  y - 1;
+            py = py - rx2;
+        }
+        if(p < 0) {
+            p=p+ry1+px;
+        } else {
+            p=p+ry1+px-py;
+        }
+        symm4_plot(xc, yc, x, y, color);
+    }
+    p = (ry1 * (x + 0.5) * (x + 0.5) + rx1 * (y - 1) * (y - 1) - rx1 * ry1);
+    while(y>0) {
+        y=y-1;
+        py=py-rx2;
+        if(p <= 0){
+            x  = x  + 1;
+            px = px + ry2;
+        }
+        if(p > 0) {
+            p = p + rx1 - py;
+        } else {
+            p = p + rx1 - py + px;
+        }
+        symm4_plot(xc, yc, x, y, color);
+    }
+}
 
 // return mode width
 int RGBargy::get_mode_width() {

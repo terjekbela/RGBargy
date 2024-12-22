@@ -30,6 +30,7 @@ class RGBargy {
     void line(short x0, short y0, short x1, short y1, char color);
     void rect(short x0, short y0, short x1, short y1, char color, bool fill=false);
     void circle(short xc, short yc, short r, char color);
+    void ellipse(short xc, short yc, short rx, short ry, char color);
 
     int get_mode_width();
     int get_mode_height();
@@ -41,6 +42,7 @@ class RGBargy {
     int fb_size;
     unsigned char * fb_pointer0;
     void symm8_plot(short xc, short yc, short x, short y, char c);
+    void symm4_plot(short xc, short yc, short x, short y, char c);
 };
 
 #endif
