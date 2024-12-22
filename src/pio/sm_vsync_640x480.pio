@@ -18,7 +18,7 @@ frontporch:
     jmp y-- frontporch
 
 set pins, 0                       ; vsync pulse for 2 cycles
-vsync:
+vsync:                            ; vsync signal is NEGATIVE
     wait 1 irq 0
     wait 1 irq 0
 
