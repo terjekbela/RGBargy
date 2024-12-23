@@ -22,15 +22,16 @@ class RGBargy {
     RGBargy(short mode_);
     ~RGBargy();
 
-    void begin();
+    void begin(short large_=0);
     void clear();
-    void pixel(short x, short y, char color);
-    void hline(short x, short y, short l, char color);
-    void vline(short x, short y, short l, char color);
-    void line(short x0, short y0, short x1, short y1, char color);
-    void rect(short x0, short y0, short x1, short y1, char color, bool fill=false);
-    void circle(short xc, short yc, short r, char color);
-    void ellipse(short xc, short yc, short rx, short ry, char color);
+    void grid(char c);
+    void pixel(short x, short y, char c);
+    void hline(short x, short y, short l, char c);
+    void vline(short x, short y, short l, char c);
+    void line(short x0, short y0, short x1, short y1, char c);
+    void rect(short x0, short y0, short x1, short y1, char c, bool f=false);
+    void circle(short xc, short yc, short r, char c);
+    void ellipse(short xc, short yc, short rx, short ry, char c);
 
     int get_mode_width();
     int get_mode_height();
@@ -38,11 +39,12 @@ class RGBargy {
     int get_cpu_mhz();
 
   private:
-    short mode, mode_width, mode_height, mode_hfrontporch;
+    short mode, large, mode_width, mode_height, mode_hfrontporch;
     int fb_size;
     unsigned char * fb_pointer0;
     void symm8_plot(short xc, short yc, short x, short y, char c);
     void symm4_plot(short xc, short yc, short x, short y, char c);
+    void symm4_fill(short xc, short yc, short x, short y, char c);
 };
 
 #endif

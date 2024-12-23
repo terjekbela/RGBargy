@@ -25,12 +25,6 @@ short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
 
 RGBargy::RGBargy(short mode_) {
-    // core voltage and mhz settings
-    // vreg_set_voltage(VREG_VOLTAGE_1_20);
-    // delay(10);
-    // set_sys_clock_khz(175000, true);
-    // delay(10);
-
     // storing mode
     mode = mode_;
 
@@ -67,7 +61,10 @@ RGBargy::~RGBargy() {
     free(fb_pointer0);
 }
 
-void RGBargy::begin() {
+void RGBargy::begin(short large_) {
+    // storing large (pixels) parameter
+    large = large_;
+    
     // getting cpu frequency for clock division
     int cpu_mhz = get_cpu_mhz();
 
@@ -178,30 +175,58 @@ void RGBargy::clear() {
     memset(fb_pointer0, 0, fb_size);
 }
 
+// draw a grid for large pixel mode with color c
+void RGBargy::grid(char c) {
+    short large_ = large;
+    large = 0;
+    clear();
+    if (large_) {
+        for (int x = 0; x < mode_width/large_; x++) {
+            vline(x*large_,          0, mode_height, c);
+            vline(x*large_+large_-1, 0, mode_height, c);
+        }
+        for (int y = 0; y < mode_height/large_; y++) {
+            hline(0, y*large_,          mode_width, c);
+            hline(0, y*large_+large_-1, mode_width, c);
+        }
+    }
+    large = large_;
+}
+
 // draw a pixel at x, y with color
-void RGBargy::pixel(short x, short y, char color) {
-    if (x < 0 || x > mode_width - 1)  return;
-    if (y < 0 || y > mode_height - 1) return;
-    int pixel = ((mode_width * y) + x);
-    if (pixel & 1) {
-        fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (color << 4) ;
+void RGBargy::pixel(short x, short y, char c) {
+    int pixel;
+    if (large) {
+        if (x < 0 || x > mode_width/large  - 1) return;
+        if (y < 0 || y > mode_height/large - 1) return;
+        for (byte dy = 1; dy<large-1; dy++) {
+            for (byte dx = 1; dx<large-1; dx++) {
+                pixel = mode_width*y*large + mode_width*dy + x*large + dx;
+                if (pixel & 1) fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (c << 4);
+                    else       fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (c);
+            }
+        }
     } else {
-        fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (color) ;
+        if (x < 0 || x > mode_width  - 1) return;
+        if (y < 0 || y > mode_height - 1) return;
+        int pixel = (mode_width * y) + x;
+        if (pixel & 1) fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (c << 4);
+            else       fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (c);
     }
 }
 
 // draw horizontal line from x0, y0 with l in length
-void RGBargy::hline(short x, short y, short l, char color) {
-    for (int i = 0; i < l; i++) pixel(x + i, y, color);
+void RGBargy::hline(short x, short y, short l, char c) {
+    for (int i = 0; i < l; i++) pixel(x + i, y, c);
 }
 
 // draw vertical line from x0, y0 with l in length
-void RGBargy::vline(short x, short y, short l, char color) {
-    for (int i = 0; i < l; i++) pixel(x, y+i, color);
+void RGBargy::vline(short x, short y, short l, char c) {
+    for (int i = 0; i < l; i++) pixel(x, y+i, c);
 }
 
 // draw a line with Bresenham's algorithm
-void RGBargy::line(short x0, short y0, short x1, short y1, char color) {
+void RGBargy::line(short x0, short y0, short x1, short y1, char c) {
     short dx, dy, ystep, err;
     short steep = abs(y1 - y0) > abs(x1 - x0);
     if (steep) {
@@ -222,9 +247,9 @@ void RGBargy::line(short x0, short y0, short x1, short y1, char color) {
     }
     for (; x0<=x1; x0++) {
         if (steep) {
-            pixel(y0, x0, color);
+            pixel(y0, x0, c);
         } else {
-            pixel(x0, y0, color);
+            pixel(x0, y0, c);
         }
         err -= dy;
         if (err < 0) {
@@ -235,44 +260,25 @@ void RGBargy::line(short x0, short y0, short x1, short y1, char color) {
 };
 
 // draw a rectangle, filled or not
-void RGBargy::rect(short x0, short y0, short x1, short y1, char color, bool fill) {
-    if(!fill) {
-        hline(x0, y0, x1 - x0, color);
-        hline(x0, y1, x1 - x0, color);
-        vline(x0, y0, y1 - y0, color);
-        vline(x1, y0, y1 - y0, color);
+void RGBargy::rect(short x0, short y0, short x1, short y1, char c, bool f) {
+    if(!f) {
+        hline(x0, y0, x1 - x0, c);
+        hline(x0, y1, x1 - x0, c);
+        vline(x0, y0, y1 - y0, c);
+        vline(x1, y0, y1 - y0, c);
     } else {
         for (int i = y0; i <= y1; i++) {
-            hline(x0, i, x1 - x0, color);
+            hline(x0, i, x1 - x0+1, c);
         }
     }
 }
 
-// 8-way symmetric helper function for circle drawing
-void RGBargy::symm8_plot(short xc, short yc, short x, short y, char color) {  
-    pixel(xc + x, yc + y, color);
-    pixel(xc + x, yc - y, color);
-    pixel(xc - x, yc - y, color);
-    pixel(xc - x, yc + y, color);
-    pixel(xc + y, yc + x, color);
-    pixel(xc + y, yc - x, color);
-    pixel(xc - y, yc - x, color);
-    pixel(xc - y, yc + x, color);
-}
-
-// 4-way symmetric helper function for ellipse drawing
-void RGBargy::symm4_plot(short xc, short yc, short x, short y, char color) {  
-    pixel(xc + x, yc + y, color);
-    pixel(xc - x, yc + y, color);
-    pixel(xc + x, yc - y, color);
-    pixel(xc - x, yc - y, color);
-}
-
 // draw a circle with the midpoint circle algorithm
-void RGBargy::circle(short xc, short yc, short r, char color) {
+void RGBargy::circle(short xc, short yc, short r, char c) {
     int x=0, y=r, d=3 - (2 * r);  
-    symm8_plot(xc, yc, x, y, color);  
-    while(x<=y) {  
+    symm8_plot(xc, yc, x, y, c);
+    while(x<=y) {
+        //delay(100);
         if(d<=0) {  
             d+= (4*x)+6;  
         } else {  
@@ -280,12 +286,12 @@ void RGBargy::circle(short xc, short yc, short r, char color) {
             y--;  
         }  
         x++;  
-        symm8_plot(xc, yc, x, y, color);
-    }  
-}  
+        symm8_plot(xc, yc, x, y, c);
+    }
+}
 
 // draw an ellipse with the midpoint ellipse algorithm
-void RGBargy::ellipse(short xc, short yc, short rx, short ry, char color) {
+void RGBargy::ellipse(short xc, short yc, short rx, short ry, char c) {
     float rx1, ry1, rx2, ry2;
     int p, x, y, px, py;
     ry1 = ry * ry;
@@ -294,7 +300,7 @@ void RGBargy::ellipse(short xc, short yc, short rx, short ry, char color) {
     rx2 =  2 * rx1;
     x   = 0;
     y   = ry;
-    symm4_plot(xc, yc, x, y, color);
+    symm4_plot(xc, yc, x, y, c);
     px = 0;
     py = rx2 * y;
     p  = (ry1 - rx1 * ry + (0.25 * rx1));
@@ -310,7 +316,7 @@ void RGBargy::ellipse(short xc, short yc, short rx, short ry, char color) {
         } else {
             p=p+ry1+px-py;
         }
-        symm4_plot(xc, yc, x, y, color);
+        symm4_plot(xc, yc, x, y, c);
     }
     p = (ry1 * (x + 0.5) * (x + 0.5) + rx1 * (y - 1) * (y - 1) - rx1 * ry1);
     while(y>0) {
@@ -325,23 +331,45 @@ void RGBargy::ellipse(short xc, short yc, short rx, short ry, char color) {
         } else {
             p = p + rx1 - py + px;
         }
-        symm4_plot(xc, yc, x, y, color);
+        symm4_plot(xc, yc, x, y, c);
     }
+}
+
+// 8-way symmetric helper function for circle drawing
+void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {  
+    pixel(xc+x, yc+y, c);
+    pixel(xc+x, yc-y, c);
+    pixel(xc-x, yc+y, c);
+    pixel(xc-x, yc-y, c);
+    pixel(xc+y, yc+x, c);
+    pixel(xc+y, yc-x, c);
+    pixel(xc-y, yc+x, c);
+    pixel(xc-y, yc-x, c);
+}
+
+// 4-way symmetric helper function for ellipse drawing
+void RGBargy::symm4_plot(short xc, short yc, short x, short y, char c) {  
+    pixel(xc+x, yc+y, c);
+    pixel(xc+x, yc-y, c);
+    pixel(xc-x, yc+y, c);
+    pixel(xc-x, yc-y, c);
 }
 
 // return mode width
 int RGBargy::get_mode_width() {
+    if (large) return mode_width/large;
     return mode_width;
 };
 
 // return mode height
 int RGBargy::get_mode_height() {
+    if (large) return mode_height/large;
     return mode_height;
 };
 
 // return mode bitdepth
 int RGBargy::get_mode_bitdepth() {
-    return 3;
+    return 4;
 };
 
 // return cpu frequency in MHz
