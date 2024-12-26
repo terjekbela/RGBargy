@@ -274,9 +274,9 @@ void RGBargy::rect(short x0, short y0, short x1, short y1, char c, bool f) {
 }
 
 // draw a circle with the midpoint circle algorithm
-void RGBargy::circle(short xc, short yc, short r, char c) {
+void RGBargy::circle(short xc, short yc, short r, char c, bool f) {
     int x=0, y=r, d=3 - (2 * r);  
-    symm8_plot(xc, yc, x, y, c);
+    if(f) symm4_fill(xc, yc, x, y, c); else symm8_plot(xc, yc, x, y, c);
     while(x<=y) {
         //delay(100);
         if(d<=0) {  
@@ -286,7 +286,7 @@ void RGBargy::circle(short xc, short yc, short r, char c) {
             y--;  
         }  
         x++;  
-        symm8_plot(xc, yc, x, y, c);
+        if(f) symm4_fill(xc, yc, x, y, c); else symm8_plot(xc, yc, x, y, c);
     }
 }
 
@@ -335,7 +335,7 @@ void RGBargy::ellipse(short xc, short yc, short rx, short ry, char c) {
     }
 }
 
-// 8-way symmetric helper function for circle drawing
+// 8-way symmetric helper function for circle
 void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {  
     pixel(xc+x, yc+y, c);
     pixel(xc+x, yc-y, c);
@@ -347,12 +347,20 @@ void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {
     pixel(xc-y, yc-x, c);
 }
 
-// 4-way symmetric helper function for ellipse drawing
+// 4-way symmetric helper function for ellipse
 void RGBargy::symm4_plot(short xc, short yc, short x, short y, char c) {  
     pixel(xc+x, yc+y, c);
     pixel(xc+x, yc-y, c);
     pixel(xc-x, yc+y, c);
     pixel(xc-x, yc-y, c);
+}
+
+// 4-way symmetric helper function for filled circle
+void RGBargy::symm4_fill(short xc, short yc, short x, short y, char c) {  
+    hline(xc-x, yc-y, x*2+1, c);
+    hline(xc-x, yc+y, x*2+1, c);
+    hline(xc-y, yc-x, y*2+1, c);
+    hline(xc-y, yc+x, y*2+1, c);
 }
 
 // return mode width

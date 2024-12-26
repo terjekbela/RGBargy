@@ -11,6 +11,14 @@
 #define RGBG_COLORS_8bit_rrrgggbb  4
 #define RGBG_COLORS_8bit_rrggbbii  5
 
+#define RGBG_LARGE_OFF   0
+#define RGBG_LARGE_4     4
+#define RGBG_LARGE_5     5
+#define RGBG_LARGE_8     8
+#define RGBG_LARGE_10   10
+#define RGBG_LARGE_12   12
+#define RGBG_LARGE_16   16
+
 #define RGBG_HSYNC_PIN  21
 #define RGBG_VSYNC_PIN  20
 #define RGBG_COLOR_PINS 16
@@ -30,7 +38,7 @@ class RGBargy {
     void vline(short x, short y, short l, char c);
     void line(short x0, short y0, short x1, short y1, char c);
     void rect(short x0, short y0, short x1, short y1, char c, bool f=false);
-    void circle(short xc, short yc, short r, char c);
+    void circle(short xc, short yc, short r, char c, bool f=false);
     void ellipse(short xc, short yc, short rx, short ry, char c);
 
     int get_mode_width();
