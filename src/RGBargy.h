@@ -40,6 +40,7 @@ class RGBargy {
     void rect(short x0, short y0, short x1, short y1, char c, bool f=false);
     void circle(short xc, short yc, short r, char c, bool f=false);
     void ellipse(short xc, short yc, short rx, short ry, char c, bool f=false);
+    void superellipse(short xc, short yc, short rx, short ry, float deg, char c);
 
     int get_mode_width();
     int get_mode_height();
@@ -53,6 +54,7 @@ class RGBargy {
     void symm8_plot(short xc, short yc, short x, short y, char c);
     void symm4_plot(short xc, short yc, short x, short y, char c);
     void symm4_fill(short xc, short yc, short x, short y, char c);
+    void symm2_fill(short xc, short yc, short x, short y, char c);
 };
 
 #endif

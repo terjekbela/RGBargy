@@ -344,6 +344,19 @@ void RGBargy::ellipse(short xc, short yc, short rx, short ry, char c, bool f) {
     }
 }
 
+// draw a superellipse 
+void RGBargy::superellipse(short xc, short yc, short rx, short ry, float n, char c) {
+    for (float t=0; t<PI/2; t+=0.002) {
+        float co = cos(t);
+        float si = sin(t);
+        float x  = round(pow(abs(co), 2/n) * rx);
+        float y  = round(pow(abs(si), 2/n) * ry);
+        symm4_plot(xc, yc, x, y, c);
+    }
+}
+
+
+
 // 8-way symmetric helper function for circle
 void RGBargy::symm8_plot(short xc, short yc, short x, short y, char c) {  
     pixel(xc+x, yc+y, c);
@@ -370,6 +383,12 @@ void RGBargy::symm4_fill(short xc, short yc, short x, short y, char c) {
     hline(xc-x, yc+y, x*2+1, c);
     hline(xc-y, yc-x, y*2+1, c);
     hline(xc-y, yc+x, y*2+1, c);
+}
+
+// 2-way symmetric helper function for filled ellipse
+void RGBargy::symm2_fill(short xc, short yc, short x, short y, char c) {  
+    hline(xc-x, yc-y, x*2+1, c);
+    hline(xc-x, yc+y, x*2+1, c);
 }
 
 // return mode width
