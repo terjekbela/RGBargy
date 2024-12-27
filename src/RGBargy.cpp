@@ -53,10 +53,19 @@ RGBargy::RGBargy(short mode_) {
     // allocating framebuffer based on res and color depth
     fb_size     = mode_width * mode_height / 2; // (/2 == 4-bit)
     fb_pointer0 = (unsigned char *)malloc(fb_size);
+    // fb_pointer0 = (unsigned char *)pmalloc(fb_size);
     memset(fb_pointer0, 0, fb_size);    
 }
 
 RGBargy::~RGBargy() {
+    // todo use defines for dma channel numbers
+    //int color_chan_0 = 0;
+    //int color_chan_1 = 1;
+
+    // stopping dma channels
+    //dma_channel_abort( color_chan_1);
+    //dma_channel_abort( color_chan_0);
+
     // releasing framebuffer memory
     free(fb_pointer0);
 }
@@ -291,7 +300,7 @@ void RGBargy::circle(short xc, short yc, short r, char c, bool f) {
 }
 
 // draw an ellipse with the midpoint ellipse algorithm
-void RGBargy::ellipse(short xc, short yc, short rx, short ry, char c) {
+void RGBargy::ellipse(short xc, short yc, short rx, short ry, char c, bool f) {
     float rx1, ry1, rx2, ry2;
     int p, x, y, px, py;
     ry1 = ry * ry;

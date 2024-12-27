@@ -39,7 +39,7 @@ class RGBargy {
     void line(short x0, short y0, short x1, short y1, char c);
     void rect(short x0, short y0, short x1, short y1, char c, bool f=false);
     void circle(short xc, short yc, short r, char c, bool f=false);
-    void ellipse(short xc, short yc, short rx, short ry, char c);
+    void ellipse(short xc, short yc, short rx, short ry, char c, bool f=false);
 
     int get_mode_width();
     int get_mode_height();
