@@ -24,9 +24,10 @@
 short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
 
-RGBargy::RGBargy(short mode_) {
-    // storing mode
+RGBargy::RGBargy(byte mode_, byte port_) {
+    // storing mode and port parameters
     mode = mode_;
+    port = port_;
 
     // setting up resolution-dependent parameters
     switch(mode) {
@@ -59,12 +60,26 @@ RGBargy::RGBargy(short mode_) {
 
 RGBargy::~RGBargy() {
     // todo use defines for dma channel numbers
-    //int color_chan_0 = 0;
-    //int color_chan_1 = 1;
+    int color_chan_0;
+    int color_chan_1;
+    switch(port) {
+        case RGBG_PORT_0:
+            color_chan_0 = 0;
+            color_chan_1 = 1;
+            break;
+        case RGBG_PORT_1:
+            color_chan_0 = 2;
+            color_chan_1 = 3;
+            break;
+        case RGBG_PORT_2:
+            color_chan_0 = 4;
+            color_chan_1 = 5;
+            break;
+    }
 
     // stopping dma channels
-    //dma_channel_abort( color_chan_1);
-    //dma_channel_abort( color_chan_0);
+    dma_channel_abort( color_chan_1);
+    dma_channel_abort( color_chan_0);
 
     // releasing framebuffer memory
     free(fb_pointer0);
@@ -74,15 +89,36 @@ void RGBargy::begin(short large_) {
     // storing large (pixels) parameter
     large = large_;
     
-    // getting cpu frequency for clock division
+    // getting cpu frequency for state-machine clock division
     int cpu_mhz = get_cpu_mhz();
 
     // setting up pio machines
-    PIO pio = pio0;
+    PIO  pio;
     uint hsync_sm = 0;
     uint vsync_sm = 1;
     uint color_sm = 2;
     uint hsync_offset, vsync_offset, color_offset;
+    byte hsync_pin, vsync_pin, color_pins;
+    switch(port) {
+        case RGBG_PORT_0:
+            pio = pio0;
+            hsync_pin  = RGBG_PORT0_HSYNC_PIN;
+            vsync_pin  = RGBG_PORT0_VSYNC_PIN;
+            color_pins = RGBG_PORT0_COLOR_PINS;
+            break;
+        case RGBG_PORT_1:
+            pio = pio1;
+            hsync_pin  = RGBG_PORT1_HSYNC_PIN;
+            vsync_pin  = RGBG_PORT1_VSYNC_PIN;
+            color_pins = RGBG_PORT1_COLOR_PINS;
+            break;
+        case RGBG_PORT_2:
+            pio = pio2;
+            hsync_pin  = RGBG_PORT2_HSYNC_PIN;
+            vsync_pin  = RGBG_PORT2_VSYNC_PIN;
+            color_pins = RGBG_PORT2_COLOR_PINS;
+            break;
+    }
     switch(mode) {
         case RGBG_MODE_640x480:
             hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
@@ -90,35 +126,35 @@ void RGBargy::begin(short large_) {
             switch(cpu_mhz) {
                 case 100:
                     color_offset = pio_add_program(pio, &sm_color_640x480x100_program);
-                    sm_color_640x480x100_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x100_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 125:
                     color_offset = pio_add_program(pio, &sm_color_640x480x125_program);
-                    sm_color_640x480x125_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x125_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 150:
                     color_offset = pio_add_program(pio, &sm_color_640x480x150_program);
-                    sm_color_640x480x150_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x150_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 175:
                     color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
-                    sm_color_640x480x175_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x175_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 200:
                     color_offset = pio_add_program(pio, &sm_color_640x480x200_program);
-                    sm_color_640x480x200_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x200_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 225:
                     color_offset = pio_add_program(pio, &sm_color_640x480x225_program);
-                    sm_color_640x480x225_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x225_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 250:
                     color_offset = pio_add_program(pio, &sm_color_640x480x250_program);
-                    sm_color_640x480x250_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_640x480x250_program_init(pio, color_sm, color_offset, color_pins);
                     break;
             }
-            sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 25);
-            sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 25);
+            sm_hsync_640x480_program_init(pio, hsync_sm, hsync_offset, hsync_pin, cpu_mhz / 25);
+            sm_vsync_640x480_program_init(pio, vsync_sm, vsync_offset, vsync_pin, cpu_mhz / 25);
             break;
         case RGBG_MODE_800x600:
             hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
@@ -126,19 +162,19 @@ void RGBargy::begin(short large_) {
             switch(cpu_mhz) {
                 case 120:
                     color_offset = pio_add_program(pio, &sm_color_800x600x120_program);
-                    sm_color_800x600x120_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_800x600x120_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 200:
                     color_offset = pio_add_program(pio, &sm_color_800x600x200_program);
-                    sm_color_800x600x200_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_800x600x200_program_init(pio, color_sm, color_offset, color_pins);
                     break;
                 case 240:
                     color_offset = pio_add_program(pio, &sm_color_800x600x240_program);
-                    sm_color_800x600x240_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_800x600x240_program_init(pio, color_sm, color_offset, color_pins);
                     break;
             }
-            sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 40);
-            sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 40);
+            sm_hsync_800x600_program_init(pio, hsync_sm, hsync_offset, hsync_pin, cpu_mhz / 40);
+            sm_vsync_800x600_program_init(pio, vsync_sm, vsync_offset, vsync_pin, cpu_mhz / 40);
             break;
         case RGBG_MODE_1024x768:
             hsync_offset = pio_add_program(pio, &sm_hsync_1024x768_program);
@@ -146,11 +182,11 @@ void RGBargy::begin(short large_) {
             switch(cpu_mhz) {
                 case 225:
                     color_offset = pio_add_program(pio, &sm_color_1024x768x225_program);
-                    sm_color_1024x768x225_program_init(pio, color_sm, color_offset, RGBG_COLOR_PINS);
+                    sm_color_1024x768x225_program_init(pio, color_sm, color_offset, color_pins);
                     break;
             }
-            sm_hsync_1024x768_program_init(pio, hsync_sm, hsync_offset, RGBG_HSYNC_PIN, cpu_mhz / 75);
-            sm_vsync_1024x768_program_init(pio, vsync_sm, vsync_offset, RGBG_VSYNC_PIN, cpu_mhz / 75);
+            sm_hsync_1024x768_program_init(pio, hsync_sm, hsync_offset, hsync_pin, cpu_mhz / 75);
+            sm_vsync_1024x768_program_init(pio, vsync_sm, vsync_offset, vsync_pin, cpu_mhz / 75);
             break;
     }
     pio_sm_put_blocking(pio, hsync_sm, hsync_active);
@@ -158,13 +194,37 @@ void RGBargy::begin(short large_) {
     pio_sm_put_blocking(pio, color_sm, color_active);
 
     // setting up dma channels
-    int color_chan_0 = 0;
-    int color_chan_1 = 1;
+    int color_chan_0;
+    int color_chan_1;
+    switch(port) {
+        case RGBG_PORT_0:
+            color_chan_0 = 0;
+            color_chan_1 = 1;
+            break;
+        case RGBG_PORT_1:
+            color_chan_0 = 2;
+            color_chan_1 = 3;
+            break;
+        case RGBG_PORT_2:
+            color_chan_0 = 4;
+            color_chan_1 = 5;
+            break;
+    }
     dma_channel_config c0 = dma_channel_get_default_config(color_chan_0);
     channel_config_set_transfer_data_size(&c0, DMA_SIZE_8);
     channel_config_set_read_increment(&c0, true);
     channel_config_set_write_increment(&c0, false);
-    channel_config_set_dreq(&c0, DREQ_PIO0_TX2) ; 
+    switch(port) {
+        case RGBG_PORT_0:
+            channel_config_set_dreq(&c0, DREQ_PIO0_TX2);
+            break;
+        case RGBG_PORT_1:
+            channel_config_set_dreq(&c0, DREQ_PIO1_TX2);
+            break;
+        case RGBG_PORT_2:
+            channel_config_set_dreq(&c0, DREQ_PIO2_TX2);
+            break;
+    }
     channel_config_set_chain_to(&c0, color_chan_1);
     dma_channel_configure(color_chan_0, &c0, &pio->txf[color_sm], &*fb_pointer0, fb_size, false);
     dma_channel_config c1 = dma_channel_get_default_config(color_chan_1);
@@ -178,6 +238,8 @@ void RGBargy::begin(short large_) {
     pio_enable_sm_mask_in_sync(pio, ((1u << hsync_sm) | (1u << vsync_sm) | (1u << color_sm)));
     dma_start_channel_mask((1u << color_chan_0)) ;
 }
+
+
 
 // clear the framebuffer with zero color
 void RGBargy::clear() {

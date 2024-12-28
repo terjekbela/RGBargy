@@ -5,6 +5,10 @@
 #define RGBG_MODE_800x600  2
 #define RGBG_MODE_1024x768 3
 
+#define RGBG_PORT_0 0
+#define RGBG_PORT_1 1
+#define RGBG_PORT_2 2
+
 #define RGBG_COLORS_4bit_iiii      1
 #define RGBG_COLORS_4bit_rgbi      2
 #define RGBG_COLORS_4bit_rggb      3
@@ -19,15 +23,21 @@
 #define RGBG_LARGE_12   12
 #define RGBG_LARGE_16   16
 
-#define RGBG_HSYNC_PIN  21
-#define RGBG_VSYNC_PIN  20
-#define RGBG_COLOR_PINS 16
+#define RGBG_PORT0_HSYNC_PIN  21
+#define RGBG_PORT0_VSYNC_PIN  20
+#define RGBG_PORT0_COLOR_PINS 16
+#define RGBG_PORT1_HSYNC_PIN  14
+#define RGBG_PORT1_VSYNC_PIN  15
+#define RGBG_PORT1_COLOR_PINS 10
+#define RGBG_PORT2_HSYNC_PIN  8
+#define RGBG_PORT2_VSYNC_PIN  9
+#define RGBG_PORT2_COLOR_PINS 4
 
 #define SWAP(a, b) { short t = a; a = b; b = t; }
 
 class RGBargy {
   public:
-    RGBargy(short mode_);
+    RGBargy(byte mode_, byte port_=RGBG_PORT_0);
     ~RGBargy();
 
     void begin(short large_=0);
@@ -48,7 +58,9 @@ class RGBargy {
     int get_cpu_mhz();
 
   private:
-    short mode, large, mode_width, mode_height, mode_hfrontporch;
+    byte mode, port, large;
+    short mode_width, mode_height, mode_hfrontporch;
+    short hsync_active, vsync_active, color_active;
     int fb_size;
     unsigned char * fb_pointer0;
     void symm8_plot(short xc, short yc, short x, short y, char c);
