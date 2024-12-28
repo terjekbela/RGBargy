@@ -4,22 +4,7 @@ __VGA display library for Arduino and RP2* microcontrollers__
 
 This is an Arduino library providing a VGA display-driver for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen directly from the Arduino framework, and not having to install compilers or the pico development environment.
 
-```
-#include <RGBargy.h>
-
-RGBargy vga0(RGBG_MODE_640x480);
-
-void setup() {
-  randomSeed(analogRead(0));
-  vga0.begin();
-}
-
-void loop() {
-    vga0.line(r(640), r(480), r(640), r(480), r(15)+1);
-    delay(1);
-}
-int r(int r) {return random(r);}
-```
+![helloword example code](/docs/assets/images/helloworld.gif)
 
 ## Hardware connections / pinout
 
@@ -80,11 +65,12 @@ For the 640x480 resolution a round 25MHz is used as the pixel clock, instead of 
 - [Online PIO Assembler](https://wokwi.com/tools/pioasm)
 
 ### Docs
-https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html
+- [Pico Series](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html)
+- [Arduino-Pico](https://arduino-pico.readthedocs.io/en/latest/)
 
 ## Licensing and Credits
 - __RGBargy__ licensed under [MIT license](https://mit-license.org/)
-- The __Arduino IDE__ and __ArduinoCore-API__ are developed and maintained by the Arduino team. The IDE is licensed under [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
+- The __Arduino IDE__ and __ArduinoCore-API__ by the Arduino team. IDE is licensed under [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
 - The __RP2040 GCC-based toolchain__ is licensed under the [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
 - The __Pico-SDK__ is by Raspberry Pi (Trading) Ltd and licensed under the [BSD 3-Clause license](https://opensource.org/license/bsd-3-clause).
 - __Arduino-Pico__ core files are licensed under the [LGPL](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html).
