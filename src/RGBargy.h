@@ -1,43 +1,43 @@
 #ifndef RGBargy_h
 #define RGBargy_h
 
-#define RGBG_MODE_640x480  1
-#define RGBG_MODE_800x600  2
-#define RGBG_MODE_1024x768 3
+#define VGA_MODE_640x480  1
+#define VGA_MODE_800x600  2
+#define VGA_MODE_1024x768 3
 
-#define RGBG_PORT_0 0
-#define RGBG_PORT_1 1
-#define RGBG_PORT_2 2
+#define VGA_PORT_0 0
+#define VGA_PORT_1 1
+#define VGA_PORT_2 2
 
-#define RGBG_COLORS_4bit_iiii      1
-#define RGBG_COLORS_4bit_rgbi      2
-#define RGBG_COLORS_4bit_rggb      3
-#define RGBG_COLORS_8bit_rrrgggbb  4
-#define RGBG_COLORS_8bit_rrggbbii  5
+#define VGA_COLOR_4bit_iiii      1
+#define VGA_COLOR_4bit_rgbi      2
+#define VGA_COLOR_4bit_rggb      3
+#define VGA_COLOR_8bit_rrrgggbb  4
+#define VGA_COLOR_8bit_rrggbbii  5
 
-#define RGBG_LARGE_OFF   0
-#define RGBG_LARGE_4     4
-#define RGBG_LARGE_5     5
-#define RGBG_LARGE_8     8
-#define RGBG_LARGE_10   10
-#define RGBG_LARGE_12   12
-#define RGBG_LARGE_16   16
+#define VGA_LARGE_OFF   0
+#define VGA_LARGE_4     4
+#define VGA_LARGE_5     5
+#define VGA_LARGE_8     8
+#define VGA_LARGE_10   10
+#define VGA_LARGE_12   12
+#define VGA_LARGE_16   16
 
-#define RGBG_PORT0_HSYNC_PIN  21
-#define RGBG_PORT0_VSYNC_PIN  20
-#define RGBG_PORT0_COLOR_PINS 16
-#define RGBG_PORT1_HSYNC_PIN  14
-#define RGBG_PORT1_VSYNC_PIN  15
-#define RGBG_PORT1_COLOR_PINS 10
-#define RGBG_PORT2_HSYNC_PIN  8
-#define RGBG_PORT2_VSYNC_PIN  9
-#define RGBG_PORT2_COLOR_PINS 4
+#define VGA_PORT0_HSYNC_PIN  21
+#define VGA_PORT0_VSYNC_PIN  20
+#define VGA_PORT0_COLOR_PINS 16
+#define VGA_PORT1_HSYNC_PIN  14
+#define VGA_PORT1_VSYNC_PIN  15
+#define VGA_PORT1_COLOR_PINS 10
+#define VGA_PORT2_HSYNC_PIN  8
+#define VGA_PORT2_VSYNC_PIN  9
+#define VGA_PORT2_COLOR_PINS 4
 
 #define SWAP(a, b) { short t = a; a = b; b = t; }
 
 class RGBargy {
   public:
-    RGBargy(byte mode_, byte port_=RGBG_PORT_0);
+    RGBargy(byte mode_, byte port_=VGA_PORT_0);
     ~RGBargy();
 
     void begin(short large_=0);
@@ -60,9 +60,26 @@ class RGBargy {
   private:
     byte mode, port, large;
     short mode_width, mode_height, mode_hfrontporch;
-    short hsync_active, vsync_active, color_active;
+
     int fb_size;
     unsigned char * fb_pointer0;
+
+    short hsync_active, vsync_active, color_active;
+
+    PIO  pio;
+    byte pio_hsync_sm = 0;
+    byte pio_hsync_pin;
+    byte pio_hsync_offset;
+    byte pio_vsync_sm = 1;
+    byte pio_vsync_pin;
+    byte pio_vsync_offset;
+    byte pio_color_sm = 2;
+    byte pio_color_pins;
+    byte pio_color_offset;
+
+    byte dma_color_chan_0;
+    byte dma_color_chan_1;
+
     void symm8_plot(short xc, short yc, short x, short y, char c);
     void symm4_plot(short xc, short yc, short x, short y, char c);
     void symm4_fill(short xc, short yc, short x, short y, char c);

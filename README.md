@@ -2,9 +2,7 @@
 
 __VGA display library for Arduino and RP2* microcontrollers__
 
-This is an Arduino library providing a VGA display-driver for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen directly from the Arduino framework, and not having to install compilers or the pico development environment.
-
-![helloword example code](/docs/assets/images/helloworld.gif)
+<img align="right" width="320" src="docs/assets/images/helloworld.gif">This is an Arduino library providing a VGA display-driver for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen directly from the Arduino framework, and not having to install compilers or the pico development environment.
 
 ## Hardware connections / pinout
 
