@@ -4,6 +4,8 @@ __VGA display library for Arduino and RP2* microcontrollers__
 
 <img align="right" width="320" src="docs/assets/images/helloworld.gif">This is an Arduino library providing a VGA display-driver for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen directly from the Arduino framework, and not having to install compilers or the pico development environment.
 
+It can drive up to 2 screens simultaneously on an RP2040 microcontroller, and 3 screens on RP2350 microcontrollers (this latter one is under development).
+
 ## Hardware connections / pinout
 
 | RP2350 GPIO pin | connected |      | VGA connector pin    |
