@@ -75,19 +75,21 @@ void RGBargy::begin(short large_) {
     // setting up pio machines
     switch(port) {
         case VGA_PORT_0:
-            pio        = pio0;
+            pio            = pio0;
             pio_hsync_pin  = VGA_PORT0_HSYNC_PIN;
             pio_vsync_pin  = VGA_PORT0_VSYNC_PIN;
             pio_color_pins = VGA_PORT0_COLOR_PINS;
             break;
         case VGA_PORT_1:
-            pio        = pio1;
+            pio            = pio1;
             pio_hsync_pin  = VGA_PORT1_HSYNC_PIN;
             pio_vsync_pin  = VGA_PORT1_VSYNC_PIN;
             pio_color_pins = VGA_PORT1_COLOR_PINS;
             break;
         case VGA_PORT_2:
-            pio        = pio2;
+            #ifdef pio2
+            pio            = pio2;
+            #endif
             pio_hsync_pin  = VGA_PORT2_HSYNC_PIN;
             pio_vsync_pin  = VGA_PORT2_VSYNC_PIN;
             pio_color_pins = VGA_PORT2_COLOR_PINS;
@@ -194,7 +196,9 @@ void RGBargy::begin(short large_) {
             channel_config_set_dreq(&c0, DREQ_PIO1_TX2);
             break;
         case VGA_PORT_2:
-            channel_config_set_dreq(&c0, DREQ_PIO2_TX2);
+            #ifdef DREQ_PIO2_TX2
+                channel_config_set_dreq(&c0, DREQ_PIO2_TX2);
+            #endif
             break;
     }
     channel_config_set_chain_to(&c0, dma_color_chan_1);
