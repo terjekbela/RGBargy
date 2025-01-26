@@ -4,6 +4,7 @@
 #include "RGBargy.h"
 #include "sm/sm_hsync_640x480.pio.h"
 #include "sm/sm_vsync_640x480.pio.h"
+#include "sm/sm_color_640x480.pio.h"
 #include "sm/sm_color_640x480x100.pio.h"
 #include "sm/sm_color_640x480x125.pio.h"
 #include "sm/sm_color_640x480x150.pio.h"
@@ -100,35 +101,15 @@ void RGBargy::begin(short large_) {
             pio_hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
             pio_vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
             switch(cpu_mhz) {
-                case 100:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x100_program);
-                    sm_color_640x480x100_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 125:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x125_program);
-                    sm_color_640x480x125_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 150:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x150_program);
-                    sm_color_640x480x150_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 175:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x175_program);
-                    sm_color_640x480x175_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 200:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x200_program);
-                    sm_color_640x480x200_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 225:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x225_program);
-                    sm_color_640x480x225_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 250:
-                    pio_color_offset = pio_add_program(pio, &sm_color_640x480x250_program);
-                    sm_color_640x480x250_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
+                case 100: pio_color_offset = pio_add_program(pio, &sm_color_640x480x100_program); break;
+                case 125: pio_color_offset = pio_add_program(pio, &sm_color_640x480x125_program); break;
+                case 150: pio_color_offset = pio_add_program(pio, &sm_color_640x480x150_program); break;
+                case 175: pio_color_offset = pio_add_program(pio, &sm_color_640x480x175_program); break;
+                case 200: pio_color_offset = pio_add_program(pio, &sm_color_640x480x200_program); break;
+                case 225: pio_color_offset = pio_add_program(pio, &sm_color_640x480x225_program); break;
+                case 250: pio_color_offset = pio_add_program(pio, &sm_color_640x480x250_program); break;
             }
+            sm_color_640x480_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
             sm_hsync_640x480_program_init(pio, pio_hsync_sm, pio_hsync_offset, pio_hsync_pin, cpu_mhz / 25);
             sm_vsync_640x480_program_init(pio, pio_vsync_sm, pio_vsync_offset, pio_vsync_pin, cpu_mhz / 25);
             break;

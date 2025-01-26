@@ -28,21 +28,4 @@ static const struct pio_program sm_color_640x480x225_program = {
     .origin = -1,
 };
 
-static inline pio_sm_config sm_color_640x480x225_program_get_default_config(uint offset) {
-    pio_sm_config c = pio_get_default_sm_config();
-    sm_config_set_wrap(&c, offset + sm_color_640x480x225_wrap_target, offset + sm_color_640x480x225_wrap);
-    return c;
-}
-
-static inline void sm_color_640x480x225_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = sm_color_640x480x225_program_get_default_config(offset);
-    sm_config_set_set_pins(&c, pin, 4);
-    sm_config_set_out_pins(&c, pin, 4);
-    pio_gpio_init(pio, pin);
-    pio_gpio_init(pio, pin+1);
-    pio_gpio_init(pio, pin+2);
-    pio_gpio_init(pio, pin+3);
-    pio_sm_set_consecutive_pindirs(pio, sm, pin, 4, true);
-    pio_sm_init(pio, sm, offset, &c);
-}
 #endif
