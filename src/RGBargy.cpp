@@ -5,15 +5,9 @@
 #include "sm/sm_hsync_640x480.pio.h"
 #include "sm/sm_vsync_640x480.pio.h"
 #include "sm/sm_color_640x480.pio.h"
-#include "sm/sm_color_640x480x100.pio.h"
-#include "sm/sm_color_640x480x125.pio.h"
-#include "sm/sm_color_640x480x150.pio.h"
-#include "sm/sm_color_640x480x175.pio.h"
-#include "sm/sm_color_640x480x200.pio.h"
-#include "sm/sm_color_640x480x225.pio.h"
-#include "sm/sm_color_640x480x250.pio.h"
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
+#include "sm/sm_color_800x600.pio.h"
 #include "sm/sm_color_800x600x120.pio.h"
 #include "sm/sm_color_800x600x200.pio.h"
 #include "sm/sm_color_800x600x240.pio.h"
@@ -117,19 +111,11 @@ void RGBargy::begin(short large_) {
             pio_hsync_offset = pio_add_program(pio, &sm_hsync_800x600_program);
             pio_vsync_offset = pio_add_program(pio, &sm_vsync_800x600_program);
             switch(cpu_mhz) {
-                case 120:
-                    pio_color_offset = pio_add_program(pio, &sm_color_800x600x120_program);
-                    sm_color_800x600x120_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 200:
-                    pio_color_offset = pio_add_program(pio, &sm_color_800x600x200_program);
-                    sm_color_800x600x200_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
-                case 240:
-                    pio_color_offset = pio_add_program(pio, &sm_color_800x600x240_program);
-                    sm_color_800x600x240_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
-                    break;
+                case 120: pio_color_offset = pio_add_program(pio, &sm_color_800x600x120_program); break;
+                case 200: pio_color_offset = pio_add_program(pio, &sm_color_800x600x200_program); break;
+                case 240: pio_color_offset = pio_add_program(pio, &sm_color_800x600x240_program); break;
             }
+            sm_color_800x600_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
             sm_hsync_800x600_program_init(pio, pio_hsync_sm, pio_hsync_offset, pio_hsync_pin, cpu_mhz / 40);
             sm_vsync_800x600_program_init(pio, pio_vsync_sm, pio_vsync_offset, pio_vsync_pin, cpu_mhz / 40);
             break;

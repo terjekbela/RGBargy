@@ -7,21 +7,67 @@
 #define sm_color_640x480_wrap_target 2
 #define sm_color_640x480_wrap 8
 
-static const uint16_t sm_color_640x480_program_instructions[] = {
-    0x80a0, //  0: pull   block                      
-    0xa047, //  1: mov    y, osr                     
-    0xe000, //  2: set    pins, 0                    
-    0xa022, //  3: mov    x, y                       
-    0x22c1, //  4: wait   1 irq, 1               [2] 
-    0x80a0, //  5: pull   block                      
-    0x6304, //  6: out    pins, 4                [3] 
-    0x6104, //  7: out    pins, 4                [1] 
-    0x0045, //  8: jmp    x--, 5                     
+static const uint16_t sm_color_640x480x100_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x22c1, 0x80a0, 0x6304, 0x6104, 0x0045
+};
+static const uint16_t sm_color_640x480x125_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x23c1, 0x80a0, 0x6404, 0x6204, 0x0045
+};
+static const uint16_t sm_color_640x480x150_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x24c1, 0x80a0, 0x6504, 0x6304, 0x0045
+};
+static const uint16_t sm_color_640x480x175_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x25c1, 0x80a0, 0x6604, 0x6404, 0x0045
+};
+static const uint16_t sm_color_640x480x200_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x26c1, 0x80a0, 0x6704, 0x6504, 0x0045
+};
+static const uint16_t sm_color_640x480x225_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x27c1, 0x80a0, 0x6804, 0x6604, 0x0045
+};
+static const uint16_t sm_color_640x480x250_program_instructions[] = {
+    0x80a0, 0xa047, 0xe000, 0xa022, 0x28c1, 0x80a0, 0x6904, 0x6704, 0x0045
 };
 
 #if !PICO_NO_HARDWARE
-static const struct pio_program sm_color_640x480_program = {
-    .instructions = sm_color_640x480_program_instructions,
+static const struct pio_program sm_color_640x480x100_program = {
+    .instructions = sm_color_640x480x100_program_instructions,
+    .length = 9,
+    .origin = -1,
+};
+
+static const struct pio_program sm_color_640x480x125_program = {
+    .instructions = sm_color_640x480x125_program_instructions,
+    .length = 9,
+    .origin = -1,
+};
+
+static const struct pio_program sm_color_640x480x150_program = {
+    .instructions = sm_color_640x480x150_program_instructions,
+    .length = 9,
+    .origin = -1,
+};
+
+static const struct pio_program sm_color_640x480x175_program = {
+    .instructions = sm_color_640x480x175_program_instructions,
+    .length = 9,
+    .origin = -1,
+};
+
+static const struct pio_program sm_color_640x480x200_program = {
+    .instructions = sm_color_640x480x200_program_instructions,
+    .length = 9,
+    .origin = -1,
+};
+
+static const struct pio_program sm_color_640x480x225_program = {
+    .instructions = sm_color_640x480x225_program_instructions,
+    .length = 9,
+    .origin = -1,
+};
+
+static const struct pio_program sm_color_640x480x250_program = {
+    .instructions = sm_color_640x480x250_program_instructions,
     .length = 9,
     .origin = -1,
 };
