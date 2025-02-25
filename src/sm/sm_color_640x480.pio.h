@@ -35,37 +35,31 @@ static const struct pio_program sm_color_640x480x100_program = {
     .length = 9,
     .origin = -1,
 };
-
 static const struct pio_program sm_color_640x480x125_program = {
     .instructions = sm_color_640x480x125_program_instructions,
     .length = 9,
     .origin = -1,
 };
-
 static const struct pio_program sm_color_640x480x150_program = {
     .instructions = sm_color_640x480x150_program_instructions,
     .length = 9,
     .origin = -1,
 };
-
 static const struct pio_program sm_color_640x480x175_program = {
     .instructions = sm_color_640x480x175_program_instructions,
     .length = 9,
     .origin = -1,
 };
-
 static const struct pio_program sm_color_640x480x200_program = {
     .instructions = sm_color_640x480x200_program_instructions,
     .length = 9,
     .origin = -1,
 };
-
 static const struct pio_program sm_color_640x480x225_program = {
     .instructions = sm_color_640x480x225_program_instructions,
     .length = 9,
     .origin = -1,
 };
-
 static const struct pio_program sm_color_640x480x250_program = {
     .instructions = sm_color_640x480x250_program_instructions,
     .length = 9,
