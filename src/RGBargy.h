@@ -23,15 +23,15 @@
 #define VGA_LARGE_12   12
 #define VGA_LARGE_16   16
 
+#define VGA_PORT0_COLOR_PINS 12
 #define VGA_PORT0_HSYNC_PIN  21
 #define VGA_PORT0_VSYNC_PIN  20
-#define VGA_PORT0_COLOR_PINS 16
-#define VGA_PORT1_HSYNC_PIN  14
-#define VGA_PORT1_VSYNC_PIN  15
-#define VGA_PORT1_COLOR_PINS 10
-#define VGA_PORT2_HSYNC_PIN  8
-#define VGA_PORT2_VSYNC_PIN  9
-#define VGA_PORT2_COLOR_PINS 4
+#define VGA_PORT1_COLOR_PINS 6
+#define VGA_PORT1_HSYNC_PIN  11
+#define VGA_PORT1_VSYNC_PIN  10
+#define VGA_PORT2_HSYNC_PIN  5
+#define VGA_PORT2_VSYNC_PIN  4
+#define VGA_PORT2_COLOR_PINS 0
 
 #define SWAP(a, b) { short t = a; a = b; b = t; }
 
