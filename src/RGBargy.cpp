@@ -10,15 +10,16 @@
 #include "sm/sm_color_800x600.pio.h"
 #include "sm/sm_hsync_1024x768.pio.h"
 #include "sm/sm_vsync_1024x768.pio.h"
-#include "sm/sm_color_1024x768x225.pio.h"
+#include "sm/sm_color_1024x768.pio.h"
 
 short mode, mode_width, mode_height, mode_hfrontporch;
 int hsync_active, vsync_active, color_active;
 
-RGBargy::RGBargy(byte mode_, byte port_) {
+RGBargy::RGBargy(byte mode_, byte port_, byte colors_) {
     // storing mode and port parameters
-    mode = mode_;
-    port = port_;
+    mode   = mode_;
+    port   = port_;
+    colors = colors_;
 
     // setting up resolution-dependent parameters
     switch(mode) {
@@ -122,7 +123,7 @@ void RGBargy::begin(short large_) {
             switch(cpu_mhz) {
                 case 225:
                     pio_color_offset = pio_add_program(pio, &sm_color_1024x768x225_program);
-                    sm_color_1024x768x225_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
+                    sm_color_1024x768_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
                     break;
             }
             sm_hsync_1024x768_program_init(pio, pio_hsync_sm, pio_hsync_offset, pio_hsync_pin, cpu_mhz / 75);

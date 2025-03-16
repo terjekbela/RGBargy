@@ -4,20 +4,11 @@ __VGA display library for Arduino and RP2* microcontrollers__
 
 <img align="right" width="320" src="docs/assets/images/helloworld.gif">This is an Arduino library providing a VGA display-driver for the RP2* family of microcontrollers. The goal of this library is to provide an easy way to drive a relatively low-res vga screen directly from the Arduino framework, and not having to install compilers or the pico development environment.
 
-It can drive up to 2 screens simultaneously on an RP2040 microcontroller, and 3 screens on RP2350 microcontrollers (this latter one is under development).
+It can drive up to 2 screens simultaneously on an RP2040 microcontroller, and 3 screens on RP2350 microcontrollers (this latter one is a work in progress).
 
 ## Hardware connections / pinout
 
-| RP2350 GPIO pin | connected |      | VGA connector pin    |
-|-----------------|-----------|------|----------------------|
-| GPIO 16         | 330R      |  ->  |  1 - Red             |
-| GPIO 17         | 330R      |  ->  |  2 - Green           |
-| GPIO 18         | 330R      |  ->  |  3 - Blue            |
-| GPIO 19         | 3x470R    | -^^^ |  1,2,3 pins          |
-| GPIO 20         |           |  ->  |  x - Vertical sync   |
-| GPIO 21         |           |  ->  |  x - Horizontal sync |
-| GND             |           |  ->  | 15  GND              |
-
+...
 
 ## Supported resolutions
 
@@ -36,7 +27,7 @@ For this library to work, the CPU frequency has to be selected manually in the A
 |  __800x600__ |         60Hz | 40.000 MHz |   200 MHz |      5x | __working__ |
 |    800x600   |         85Hz | 56.250 MHz |   225 MHz |      4x | devel       |
 |    800x600   |         60Hz | 40.000 MHz |   240 MHz |      6x | __working__ |
-| __1024x768__ |         70Hz | 75.000 MHz |   225 MHz |      3x | testing     |
+| __1024x768__ |         70Hz | 75.000 MHz |   225 MHz |      3x | __working__ |
 
 
 ## VGA timings
