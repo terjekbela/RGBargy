@@ -4,7 +4,8 @@
 #include "RGBargy.h"
 #include "sm/sm_hsync_640x480.pio.h"
 #include "sm/sm_vsync_640x480.pio.h"
-#include "sm/sm_color_640x480.pio.h"
+#include "sm/sm_color_640x480x4bit.pio.h"
+#include "sm/sm_color_640x480x8bit.pio.h"
 #include "sm/sm_hsync_800x600.pio.h"
 #include "sm/sm_vsync_800x600.pio.h"
 #include "sm/sm_color_800x600.pio.h"
@@ -41,10 +42,22 @@ RGBargy::RGBargy(byte mode_, byte port_, byte colors_) {
     }
     hsync_active = mode_width + mode_hfrontporch - 1;
     vsync_active = mode_height - 1;
-    color_active = mode_width / 2 - 1;
 
-    // allocating framebuffer based on res and color depth
-    fb_size     = mode_width * mode_height / 2; // (/2 == 4-bit)
+    // allocating framebuffer based on resolution and color depth
+    switch(colors) {
+        case VGA_COLOR_4bit_iiii:
+        case VGA_COLOR_4bit_rgbi:
+        case VGA_COLOR_4bit_rggb:
+            color_active = mode_width / 2 - 1;
+            fb_size = mode_width * mode_height / 2; // (4-bit)
+            break;
+        case VGA_COLOR_6bit_rrggbb:
+        case VGA_COLOR_8bit_rrggbbii:
+        case VGA_COLOR_8bit_rrrgggbb:
+            color_active = mode_width - 1;
+            fb_size = mode_width * mode_height;     // (8-bit)
+            break;
+    }
     fb_pointer0 = (unsigned char *)malloc(fb_size);
     memset(fb_pointer0, 0, fb_size);    
 }
@@ -81,7 +94,7 @@ void RGBargy::begin(short large_) {
             break;
         case VGA_PORT_2:
             #ifdef pio2
-            pio            = pio2;
+                pio        = pio2;
             #endif
             pio_hsync_pin  = VGA_PORT2_HSYNC_PIN;
             pio_vsync_pin  = VGA_PORT2_VSYNC_PIN;
@@ -92,16 +105,29 @@ void RGBargy::begin(short large_) {
         case VGA_MODE_640x480:
             pio_hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
             pio_vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
-            switch(cpu_mhz) {
-                case 100: pio_color_offset = pio_add_program(pio, &sm_color_640x480x100_program); break;
-                case 125: pio_color_offset = pio_add_program(pio, &sm_color_640x480x125_program); break;
-                case 150: pio_color_offset = pio_add_program(pio, &sm_color_640x480x150_program); break;
-                case 175: pio_color_offset = pio_add_program(pio, &sm_color_640x480x175_program); break;
-                case 200: pio_color_offset = pio_add_program(pio, &sm_color_640x480x200_program); break;
-                case 225: pio_color_offset = pio_add_program(pio, &sm_color_640x480x225_program); break;
-                case 250: pio_color_offset = pio_add_program(pio, &sm_color_640x480x250_program); break;
+            switch(colors) {
+                case VGA_COLOR_4bit_iiii:
+                case VGA_COLOR_4bit_rgbi:
+                case VGA_COLOR_4bit_rggb:
+                    switch(cpu_mhz) {
+                        case 100: pio_color_offset = pio_add_program(pio, &sm_color_640x480x100x4bit_program); break;
+                        case 125: pio_color_offset = pio_add_program(pio, &sm_color_640x480x125x4bit_program); break;
+                        case 150: pio_color_offset = pio_add_program(pio, &sm_color_640x480x150x4bit_program); break;
+                        case 175: pio_color_offset = pio_add_program(pio, &sm_color_640x480x175x4bit_program); break;
+                        case 200: pio_color_offset = pio_add_program(pio, &sm_color_640x480x200x4bit_program); break;
+                        case 225: pio_color_offset = pio_add_program(pio, &sm_color_640x480x225x4bit_program); break;
+                        case 250: pio_color_offset = pio_add_program(pio, &sm_color_640x480x250x4bit_program); break;
+                    }
+                    sm_color_640x480x4bit_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
+                    break;
+                case VGA_COLOR_6bit_rrggbb:
+                case VGA_COLOR_8bit_rrrgggbb:
+                case VGA_COLOR_8bit_rrggbbii:
+                    switch(cpu_mhz) {
+                        case 200: pio_color_offset = pio_add_program(pio, &sm_color_640x480x200x8bit_program); break;
+                    }
+                    sm_color_640x480x8bit_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
             }
-            sm_color_640x480_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
             sm_hsync_640x480_program_init(pio, pio_hsync_sm, pio_hsync_offset, pio_hsync_pin, cpu_mhz / 25);
             sm_vsync_640x480_program_init(pio, pio_vsync_sm, pio_vsync_offset, pio_vsync_pin, cpu_mhz / 25);
             break;
@@ -161,7 +187,7 @@ void RGBargy::begin(short large_) {
             channel_config_set_dreq(&c0, DREQ_PIO1_TX2);
             break;
         case VGA_PORT_2:
-            #ifdef DREQ_PIO2_TX2
+            #ifdef pio2
                 channel_config_set_dreq(&c0, DREQ_PIO2_TX2);
             #endif
             break;
@@ -208,23 +234,48 @@ void RGBargy::grid(char c) {
 // draw a pixel at x, y with color
 void RGBargy::pixel(short x, short y, char c) {
     int pixel;
-    if (large) {
-        if (x < 0 || x > mode_width/large  - 1) return;
-        if (y < 0 || y > mode_height/large - 1) return;
-        for (byte dy = 1; dy<large-1; dy++) {
-            for (byte dx = 1; dx<large-1; dx++) {
-                pixel = mode_width*y*large + mode_width*dy + x*large + dx;
+    switch(colors) {
+        case VGA_COLOR_4bit_iiii:
+        case VGA_COLOR_4bit_rgbi:
+        case VGA_COLOR_4bit_rggb:
+            if (large) {
+                if (x < 0 || x > mode_width/large  - 1) return;
+                if (y < 0 || y > mode_height/large - 1) return;
+                for (byte dy = 1; dy<large-1; dy++) {
+                    for (byte dx = 1; dx<large-1; dx++) {
+                        pixel = mode_width*y*large + mode_width*dy + x*large + dx;
+                        if (pixel & 1) fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (c << 4);
+                            else       fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (c);
+                    }
+                }
+            } else {
+                if (x < 0 || x > mode_width  - 1) return;
+                if (y < 0 || y > mode_height - 1) return;
+                int pixel = (mode_width * y) + x;
                 if (pixel & 1) fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (c << 4);
                     else       fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (c);
             }
+            break;
+        case VGA_COLOR_6bit_rrggbb:
+        case VGA_COLOR_8bit_rrggbbii:
+        case VGA_COLOR_8bit_rrrgggbb:
+            if (large) {
+                if (x < 0 || x > mode_width/large  - 1) return;
+                if (y < 0 || y > mode_height/large - 1) return;
+                for (byte dy = 1; dy<large-1; dy++) {
+                    for (byte dx = 1; dx<large-1; dx++) {
+                        pixel = mode_width*y*large + mode_width*dy + x*large + dx;
+                        fb_pointer0[pixel] = c;
+                    }
+                }
+            } else {
+                if (x < 0 || x > mode_width  - 1) return;
+                if (y < 0 || y > mode_height - 1) return;
+                int pixel = mode_width * y + x;
+                fb_pointer0[pixel] = c;
+            }
+            break;
         }
-    } else {
-        if (x < 0 || x > mode_width  - 1) return;
-        if (y < 0 || y > mode_height - 1) return;
-        int pixel = (mode_width * y) + x;
-        if (pixel & 1) fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b00001111) | (c << 4);
-            else       fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (c);
-    }
 }
 
 // draw horizontal line from x0, y0 with l in length

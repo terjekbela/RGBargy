@@ -12,8 +12,9 @@
 #define VGA_COLOR_4bit_iiii      1
 #define VGA_COLOR_4bit_rgbi      2
 #define VGA_COLOR_4bit_rggb      3
-#define VGA_COLOR_8bit_rrrgggbb  4
-#define VGA_COLOR_8bit_rrggbbii  5
+#define VGA_COLOR_6bit_rrggbb    4
+#define VGA_COLOR_8bit_rrrgggbb  5
+#define VGA_COLOR_8bit_rrggbbii  6
 
 #define VGA_LARGE_OFF   0
 #define VGA_LARGE_4     4
@@ -29,15 +30,15 @@
 #define VGA_PORT1_COLOR_PINS 6
 #define VGA_PORT1_HSYNC_PIN  11
 #define VGA_PORT1_VSYNC_PIN  10
-#define VGA_PORT2_HSYNC_PIN  12
-#define VGA_PORT2_VSYNC_PIN  21
-#define VGA_PORT2_COLOR_PINS 20
+#define VGA_PORT2_COLOR_PINS 12
+#define VGA_PORT2_HSYNC_PIN  21
+#define VGA_PORT2_VSYNC_PIN  20
 
 #define SWAP(a, b) { short t = a; a = b; b = t; }
 
 class RGBargy {
   public:
-    RGBargy(byte mode_, byte port_=VGA_PORT_0);
+    RGBargy(byte mode_, byte port_=VGA_PORT_0, byte colors_=VGA_COLOR_4bit_rgbi);
     ~RGBargy();
 
     void begin(short large_=0);
@@ -58,7 +59,7 @@ class RGBargy {
     int get_cpu_mhz();
 
   private:
-    byte mode, port, large;
+    byte mode, port, colors, large;
     short mode_width, mode_height, mode_hfrontporch;
 
     int fb_size;
