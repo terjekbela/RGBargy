@@ -275,7 +275,7 @@ void RGBargy::pixel(short x, short y, char c) {
                 fb_pointer0[pixel] = c;
             }
             break;
-        }
+    }
 }
 
 // draw horizontal line from x0, y0 with l in length
@@ -459,7 +459,22 @@ int RGBargy::get_mode_height() {
 
 // return mode bitdepth
 int RGBargy::get_mode_bitdepth() {
-    return 4;
+    int ret;
+    switch(colors) {
+        case VGA_COLOR_4bit_iiii:
+        case VGA_COLOR_4bit_rgbi:
+        case VGA_COLOR_4bit_rggb:
+            ret = 4;
+            break;
+        case VGA_COLOR_6bit_rrggbb:
+            ret = 6;
+            break;
+        case VGA_COLOR_8bit_rrggbbii:
+        case VGA_COLOR_8bit_rrrgggbb:
+            ret = 8;
+            break;
+    }
+    return ret;
 };
 
 // return cpu frequency in MHz
