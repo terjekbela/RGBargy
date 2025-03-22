@@ -124,6 +124,7 @@ void RGBargy::begin(short large_) {
                 case VGA_COLOR_8bit_rrrgggbb:
                 case VGA_COLOR_8bit_rrggbbii:
                     switch(cpu_mhz) {
+                        case 150: pio_color_offset = pio_add_program(pio, &sm_color_640x480x150x8bit_program); break;
                         case 200: pio_color_offset = pio_add_program(pio, &sm_color_640x480x200x8bit_program); break;
                     }
                     sm_color_640x480x8bit_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);

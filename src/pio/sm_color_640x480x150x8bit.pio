@@ -1,0 +1,39 @@
+.program sm_color_640x480x150x8bit
+
+
+
+pull block                        ; get buffer length (once)
+mov y, osr
+.wrap_target
+
+set pins, 0 				      ; low color pins in blanking
+mov x, y
+
+wait 1 irq 1 [4]			      ; wait vsync irq 1 active mode (starts 6 cycles after execution)
+
+colorout:
+	pull block				      ; get color value
+	out pins, 8	[3]		          ; 8-bit pixel 1+5+1+1 = 8 cycles
+	jmp x-- colorout
+
+.wrap
+
+
+
+% c-sdk {
+static inline void sm_color_640x480x200x8bit_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = sm_color_640x480x200x8bit_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, pin, 8);
+    sm_config_set_out_pins(&c, pin, 8);
+    pio_gpio_init(pio, pin);
+    pio_gpio_init(pio, pin+1);
+    pio_gpio_init(pio, pin+2);
+    pio_gpio_init(pio, pin+3);
+    pio_gpio_init(pio, pin+4);
+    pio_gpio_init(pio, pin+5);
+    pio_gpio_init(pio, pin+6);
+    pio_gpio_init(pio, pin+7);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 8, true);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
