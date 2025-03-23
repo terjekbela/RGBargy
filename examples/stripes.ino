@@ -10,12 +10,10 @@ short h = vga0.get_mode_height();
 short c = 1 << vga0.get_mode_bitdepth();
 
 void setup() {
-  Serial.begin(115200);
   vga0.begin();
 }
 
 void loop() {
-  Serial.println(1 << vga0.get_mode_bitdepth());
   for (short x=0; x<c; x++) {
     vga0.rect(x*w/c, 0, (x+1)*w/c-2, h-1, x, true);
   }
