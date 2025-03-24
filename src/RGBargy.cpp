@@ -45,15 +45,15 @@ RGBargy::RGBargy(byte mode_, byte port_, byte colors_) {
 
     // allocating framebuffer based on resolution and color depth
     switch(colors) {
-        case VGA_COLOR_4bit_iiii:
-        case VGA_COLOR_4bit_rgbi:
-        case VGA_COLOR_4bit_rggb:
+        case VGA_COLOR_iiii:
+        case VGA_COLOR_rgbi:
+        case VGA_COLOR_rggb:
             color_active = mode_width / 2 - 1;
             fb_size = mode_width * mode_height / 2; // (4-bit)
             break;
-        case VGA_COLOR_6bit_rrggbb:
-        case VGA_COLOR_8bit_rrggbbii:
-        case VGA_COLOR_8bit_rrrgggbb:
+        case VGA_COLOR_rrggbb:
+        case VGA_COLOR_rrggbbii:
+        case VGA_COLOR_rrrgggbb:
             color_active = mode_width - 1;
             fb_size = mode_width * mode_height;     // (8-bit)
             break;
@@ -106,9 +106,9 @@ void RGBargy::begin(short large_) {
             pio_hsync_offset = pio_add_program(pio, &sm_hsync_640x480_program);
             pio_vsync_offset = pio_add_program(pio, &sm_vsync_640x480_program);
             switch(colors) {
-                case VGA_COLOR_4bit_iiii:
-                case VGA_COLOR_4bit_rgbi:
-                case VGA_COLOR_4bit_rggb:
+                case VGA_COLOR_iiii:
+                case VGA_COLOR_rgbi:
+                case VGA_COLOR_rggb:
                     switch(cpu_mhz) {
                         case 100: pio_color_offset = pio_add_program(pio, &sm_color_640x480x100x4bit_program); break;
                         case 125: pio_color_offset = pio_add_program(pio, &sm_color_640x480x125x4bit_program); break;
@@ -120,9 +120,9 @@ void RGBargy::begin(short large_) {
                     }
                     sm_color_640x480x4bit_program_init(pio, pio_color_sm, pio_color_offset, pio_color_pins);
                     break;
-                case VGA_COLOR_6bit_rrggbb:
-                case VGA_COLOR_8bit_rrrgggbb:
-                case VGA_COLOR_8bit_rrggbbii:
+                case VGA_COLOR_rrggbb:
+                case VGA_COLOR_rrrgggbb:
+                case VGA_COLOR_rrggbbii:
                     switch(cpu_mhz) {
                         case 150: pio_color_offset = pio_add_program(pio, &sm_color_640x480x150x8bit_program); break;
                         case 175: pio_color_offset = pio_add_program(pio, &sm_color_640x480x175x8bit_program); break;
@@ -238,9 +238,9 @@ void RGBargy::grid(char c) {
 void RGBargy::pixel(short x, short y, char c) {
     int pixel;
     switch(colors) {
-        case VGA_COLOR_4bit_iiii:
-        case VGA_COLOR_4bit_rgbi:
-        case VGA_COLOR_4bit_rggb:
+        case VGA_COLOR_iiii:
+        case VGA_COLOR_rgbi:
+        case VGA_COLOR_rggb:
             if (large) {
                 if (x < 0 || x > mode_width/large  - 1) return;
                 if (y < 0 || y > mode_height/large - 1) return;
@@ -259,9 +259,9 @@ void RGBargy::pixel(short x, short y, char c) {
                     else       fb_pointer0[pixel>>1] = (fb_pointer0[pixel>>1] & 0b11110000) | (c);
             }
             break;
-        case VGA_COLOR_6bit_rrggbb:
-        case VGA_COLOR_8bit_rrggbbii:
-        case VGA_COLOR_8bit_rrrgggbb:
+        case VGA_COLOR_rrggbb:
+        case VGA_COLOR_rrggbbii:
+        case VGA_COLOR_rrrgggbb:
             if (large) {
                 if (x < 0 || x > mode_width/large  - 1) return;
                 if (y < 0 || y > mode_height/large - 1) return;
@@ -464,16 +464,16 @@ int RGBargy::get_mode_height() {
 int RGBargy::get_mode_bitdepth() {
     int ret;
     switch(colors) {
-        case VGA_COLOR_4bit_iiii:
-        case VGA_COLOR_4bit_rgbi:
-        case VGA_COLOR_4bit_rggb:
+        case VGA_COLOR_iiii:
+        case VGA_COLOR_rgbi:
+        case VGA_COLOR_rggb:
             ret = 4;
             break;
-        case VGA_COLOR_6bit_rrggbb:
+        case VGA_COLOR_rrggbb:
             ret = 6;
             break;
-        case VGA_COLOR_8bit_rrggbbii:
-        case VGA_COLOR_8bit_rrrgggbb:
+        case VGA_COLOR_rrggbbii:
+        case VGA_COLOR_rrrgggbb:
             ret = 8;
             break;
     }

@@ -9,12 +9,12 @@
 #define VGA_PORT_1 1
 #define VGA_PORT_2 2
 
-#define VGA_COLOR_4bit_iiii      1
-#define VGA_COLOR_4bit_rgbi      2
-#define VGA_COLOR_4bit_rggb      3
-#define VGA_COLOR_6bit_rrggbb    4
-#define VGA_COLOR_8bit_rrrgggbb  5
-#define VGA_COLOR_8bit_rrggbbii  6
+#define VGA_COLOR_iiii      1
+#define VGA_COLOR_rgbi      2
+#define VGA_COLOR_rggb      3
+#define VGA_COLOR_rrggbb    4
+#define VGA_COLOR_rrrgggbb  5
+#define VGA_COLOR_rrggbbii  6
 
 #define VGA_LARGE_OFF   0
 #define VGA_LARGE_4     4
@@ -38,7 +38,7 @@
 
 class RGBargy {
   public:
-    RGBargy(byte mode_, byte port_=VGA_PORT_0, byte colors_=VGA_COLOR_4bit_rgbi);
+    RGBargy(byte mode_, byte port_=VGA_PORT_0, byte colors_=VGA_COLOR_rgbi);
     ~RGBargy();
 
     void begin(short large_=0);
